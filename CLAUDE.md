@@ -39,7 +39,7 @@ Project memory for Claude. Read this before changing anything. Keep it current: 
 ## Design decisions (all approved by the owner)
 
 - **Look:** black background, large thin lowercase type, the Windows Phone pivot menu (current item white, others grey), round outlined app-bar buttons, square tiles. Zune magenta accent `#d6006f`, a pink→orange gradient (`--gradient-zune`) and pink/orange weekday colours.
-- **Header** (`SiteHeader`):
+- **Header** (`SiteHeader`, never animated between pages):
   - On the homepage, a giant "lone voice" runs off the right edge, with the tagline "short notes, written down." underneath.
   - Inner pages have a compact 64 px name.
   - Pink→orange angled shapes (`ZuneArt`) sit behind the name and fade to black on the left. On phones the shapes stay beside the name, clear of the menu.
@@ -95,9 +95,11 @@ Built on Astro's `<ClientRouter />` (in `BaseHead.astro`), so pages swap without
 - **Turnstile:** every other navigation.
   - **Exit:** the visible items swing away one by one on a left-edge hinge, using the Web Animations API inside an overridden `event.loader`, in parallel with loading the next page.
   - **Entry:** the old column fades; the new column appears at once and its items **feather** in.
-- **Feather:** each item turns in on its left-edge hinge, staggered. Use `class="feather"` with `style="--i: N"` on items, or `data-feather` on a container.
+- **Feather — lists only** (timeline cards, topic tiles, archive rows, search results): each item turns in on its left-edge hinge, staggered. Use `class="feather"` with `style="--i: N"`, or `data-feather` on a list container. Non-list pages (post, about, policies, search box, page intros) turn in as **a few large blocks** (`.feather` on the block, never on each paragraph). The owner found per-paragraph and per-sidebar-item animation unnecessary.
 - **Continuum:** a post's date, title and cover fly between its timeline card and the post page. The title gives a small lift first.
-- **Header:** the site name morphs between giant and compact, and the menu and shapes glide. The tagline waits for the name to land, then drops in.
+- **Header: never animated.** It has no `transition:name` and stays part of the root snapshot, which cross-fades in place (identical headers show no change; the homepage's large header and the compact one cross-fade). Windows Phone never animated a shared header; the earlier giant↔compact morph looked janky on desktop and was removed.
+- **Sidebar: never animated** on navigation (same content on every page). It only cross-fades in a turnstile and fades out in a pivot.
+- **Prefetch:** `prefetch: { prefetchAll: true, defaultStrategy: 'viewport' }` in `astro.config.mjs`, so the next page is usually ready before the exit ends (touch screens never hover). This is what keeps transitions smooth on phones.
 
 **Current timings** (the owner has slowed them twice; ask before changing):
 - Flights and feather: 0.6 s
@@ -112,7 +114,7 @@ Built on Astro's `<ClientRouter />` (in `BaseHead.astro`), so pages swap without
 2. **Never put static `transition:name` on list items.** Posts that appear on two pages fly across the screen. Timeline cards carry `data-continuum` markers instead, and `MotionDirector` names only the one card involved.
 3. **Never pass an empty or undefined `transition:name`.** Astro then generates numbered names (`astro-<hash>-N`) that pair unrelated elements across pages. Render the directive only when the value exists.
 4. **Post pages name their date, title and cover** (`data-flight` + `transition:name`). The director checks, after the next page has loaded, whether a partner exists. Unpaired pieces get `view-transition-name: none` and swing away or feather in like the rest. `.flying` marks pieces that really fly, and these skip the feather.
-5. **The header glides only when the scroll position barely changes** (under 24 px). Otherwise it would fly in from above the screen. The rule targets `[data-site-header]`, because post pages have their own `<header>`.
+5. **Never name the site header or its pieces.** Named, it morphed (janky), flew in from above when the scroll position changed, and showed an off-screen header at the top. Unnamed, it cross-fades in place. Post pages have their own `<header>`; target the site header as `[data-site-header]` if ever needed.
 6. **Shared elements whose size changes:** text (`view-transition-class: text`) and covers (`cover`) hide the old copy and scale the new one, instead of cross-fading two sizes.
 7. **`::view-transition-group(main|sidebar)` has `animation: none`.** Morphing column boxes stretches the text.
 8. **Page scripts run once under the client router.** Put setup in an `astro:page-load` listener (see `search.astro`).
@@ -148,7 +150,7 @@ npm run preview
   - Screenshots at 390×844 and 1440×900.
   - Slow motion: create a CDP session, call `Animation.enable` and `Animation.setPlaybackRate({ playbackRate: 0.1 })`, then take screenshots every ~500 ms during a navigation.
 - **Motion audit:**
-  - **Unpaired elements:** for each kind of navigation (home → post, deep tap, archive/search/pinned → post, post → older post, post → menu, pivots, back), record computed `view-transition-name`s on `astro:before-swap` (old page) and `astro:after-swap` (new page). Anything on only one side, except `root`, `main`, `sidebar`, `tagline` and the desktop `search-button`, is jank.
+  - **Unpaired elements:** for each kind of navigation (home → post, deep tap, archive/search/pinned → post, post → older post, post → menu, pivots, back), record computed `view-transition-name`s on `astro:before-swap` (old page) and `astro:after-swap` (new page). Anything on only one side, except `root`, `main` and `sidebar`, is jank. The expected flying names are only `post-date-*`, `post-title-*` and `post-cover-*`.
   - **Running animations:** `document.getAnimations()` right after a swap lists every animation, including the view-transition pseudo-elements.
 - **The live site is reachable from this environment** for checks after a deploy.
 

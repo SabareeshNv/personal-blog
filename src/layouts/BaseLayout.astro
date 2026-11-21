@@ -33,7 +33,7 @@ const hasSidebar = Astro.slots.has('sidebar');
       </main>
       {
         hasSidebar && (
-          <aside class="sidebar" aria-label={`More from ${SITE.title}`} transition:name="sidebar" transition:animate="none" data-feather>
+          <aside class="sidebar" aria-label={`More from ${SITE.title}`} transition:name="sidebar" transition:animate="none">
             <slot name="sidebar" />
           </aside>
         )

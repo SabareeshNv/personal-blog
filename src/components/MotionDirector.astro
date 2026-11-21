@@ -69,30 +69,6 @@
     return names;
   }
 
-  /* ---------- Header ---------- */
-
-  /*
-   * The header sits at the top of every page, so on screen it moves by
-   * exactly the change in scroll position. A new page starts at the top and
-   * going back restores the old position; if that changes the scroll by more
-   * than a few pixels, gliding would carry the name, menu and shapes in from
-   * (or off to) above the screen. Then they stay still instead.
-   */
-  // The site header only: a post page has its own <header> around the title.
-  const HEADER_PIECES = '[data-site-header] [data-astro-transition-scope]';
-  let headerGlides = true;
-
-  const HEADER_SCROLL_TOLERANCE = 24;
-
-  function scrollAfter(event: { navigationType: string }) {
-    if (event.navigationType !== 'traverse') return 0; // new pages start at the top
-    return (history.state as { scrollY?: number } | null)?.scrollY ?? 0;
-  }
-
-  function stillHeader(doc: Document) {
-    doc.querySelectorAll<HTMLElement>(HEADER_PIECES).forEach((el) => (el.style.viewTransitionName = 'none'));
-  }
-
   /* ---------- Turnstile exit ---------- */
 
   const ITEMS = 'main .feather, main [data-feather] > *';
@@ -141,9 +117,6 @@
     const motion = motionFor(event.from, event.to);
     document.documentElement.dataset.motion = motion;
 
-    headerGlides = Math.abs(scrollY - scrollAfter(event)) < HEADER_SCROLL_TOLERANCE;
-    if (!headerGlides) stillHeader(document);
-
     // Opening a post from a list: its card is the only one that may fly.
     clearCardNames(document);
     const toId = postIdOf(event.to);
@@ -177,7 +150,6 @@
     const doc = event.newDocument;
     // Astro copies <html> attributes from the incoming page, so set it there too.
     doc.documentElement.dataset.motion = document.documentElement.dataset.motion;
-    if (!headerGlides) stillHeader(doc);
 
     // Names still active on the outgoing page: the only possible partners.
     const departing = new Set(

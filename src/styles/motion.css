@@ -6,7 +6,10 @@
  * and writes it to <html data-motion="…">; this file draws each one.
  *
  *   pivot-next / pivot-prev   between the menu sections: content slides sideways
- *   turnstile                 everything else: items swing out, then feather in
+ *   turnstile                 everything else: items swing out, then turn in
+ *
+ * Kept deliberately close to Windows Phone: lists feather (item by item),
+ * other pages turn in as a few large blocks, the header and sidebar stay put.
  *
  * The turnstile exit (items swinging away one by one) runs in the director's
  * script, before the page changes, so each item turns on its own short hinge.
@@ -146,29 +149,12 @@ html[data-motion^='pivot']::view-transition-old(sidebar) {
 }
 
 /*
- * The homepage tagline has no partner on other pages. It waits while the
- * site name flies and grows, then drops into place as the name lands; when
- * leaving the homepage it fades out at once.
+ * The site header has no name on purpose: Windows Phone never animated a
+ * shared header. It is part of the page background (root), which cross-fades
+ * where it is on screen: identical headers show no change, the homepage's
+ * large header and the compact one cross-fade in place, and a header
+ * scrolled out of view can't appear on screen.
  */
-@keyframes lv-tagline-in {
-  from {
-    opacity: 0;
-    transform: translateY(-0.5rem);
-  }
-}
-
-::view-transition-group(tagline) {
-  animation: none !important;
-}
-
-::view-transition-old(tagline) {
-  animation: lv-fade-out var(--duration-fade) linear both !important;
-}
-
-::view-transition-new(tagline) {
-  animation: lv-tagline-in calc(var(--duration-morph) * 0.6) var(--ease-out-quint)
-    calc(var(--duration-morph) * 0.5) both !important;
-}
 
 /* ---------- Feather ---------- */
 
@@ -207,23 +193,6 @@ html[data-motion^='pivot']::view-transition-old(sidebar) {
   animation: none;
 }
 
-/*
- * Header pieces that exist on only one side (the search button shows only
- * where there is no sidebar) fade instead of popping.
- */
-@keyframes lv-fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
-::view-transition-new(search-button):only-child {
-  animation: lv-fade-in var(--duration-feather) var(--ease-out-quint) both;
-}
-
-::view-transition-old(search-button):only-child {
-  animation: lv-fade-out var(--duration-fade) linear both;
-}
 
 /* A pivot slides whole sections; its items don't feather. */
 html[data-motion^='pivot'] :is(.feather, [data-feather] > *) {
