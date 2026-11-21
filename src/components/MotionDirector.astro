@@ -6,8 +6,10 @@
  *   content slides sideways, in the direction of the menu.
  * - Turnstile: anywhere else, the visible items swing away one by one on
  *   their left-edge hinge, then the new page's items feather in.
- * - Continuum: the post being opened (or returned from) keeps its date, title
- *   and cover; they lift slightly, then fly to their place on the next page.
+ * - Continuum: a post's date, title and cover fly between the timeline and
+ *   the post page, but only when the other page really shows the same post.
+ *   Anything without a partner swings away or feathers in like the rest,
+ *   instead of hanging in place and fading.
  *
  * The choice is written to <html data-motion="…"> for src/styles/motion.css.
  */
@@ -22,72 +24,116 @@
   const POST_PATH = /^\/posts\/([^/]+)\/?$/;
   const postIdOf = (url: URL) => url.pathname.match(POST_PATH)?.[1];
 
-  /* ---------- Continuum: name only the post involved ---------- */
+  /* ---------- Names ---------- */
 
-  function nameCard(doc: Document, id: string) {
+  /** The flight name of an element: a post page's `data-flight`, or a named card part. */
+  function flightName(el: HTMLElement): string | undefined {
+    if (el.dataset.flight) return el.dataset.flight;
+    const name = el.style.viewTransitionName;
+    return name && name !== 'none' ? name : undefined;
+  }
+
+  /** Card parts for post `id` in `doc`, with the names they would fly under. */
+  function cardParts(doc: Document, id: string) {
     const card = doc.querySelector<HTMLElement>(`[data-post-id="${CSS.escape(id)}"]`);
+    const parts = [...(card?.querySelectorAll<HTMLElement>('[data-continuum]') ?? [])];
+    return { card, parts: parts.map((el) => ({ el, name: shared[el.dataset.continuum as Part](id) })) };
+  }
+
+  /** Give the card for post `id` its flight names (only the card involved flies). */
+  function nameCard(doc: Document, id: string, allowed?: Set<string>) {
+    const { card, parts } = cardParts(doc, id);
     if (!card) return;
-    card.classList.add('continuum-target'); // flies; doesn't also feather in
-    card.querySelectorAll<HTMLElement>('[data-continuum]').forEach((el) => {
-      el.style.viewTransitionName = shared[el.dataset.continuum as Part](id);
-    });
+    let named = 0;
+    for (const { el, name } of parts) {
+      if (allowed && !allowed.has(name)) continue;
+      el.style.viewTransitionName = name;
+      named++;
+    }
+    if (named) card.classList.add('flying'); // flies; doesn't also feather in
   }
 
-  function clearNames(doc: Document) {
-    doc.querySelectorAll<HTMLElement>('[data-continuum]').forEach((el) => {
-      el.style.viewTransitionName = '';
-    });
+  function clearCardNames(doc: Document) {
+    doc.querySelectorAll<HTMLElement>('[data-continuum]').forEach((el) => (el.style.viewTransitionName = ''));
   }
 
-  /** Elements that will fly to the next page (named post-…). */
-  function flyingElements(): HTMLElement[] {
-    return [...document.querySelectorAll<HTMLElement>('main [data-continuum], main [data-astro-transition-scope]')].filter(
-      (el) => getComputedStyle(el).viewTransitionName.startsWith('post-'),
-    );
+  /** Elements on this page that could fly (named post pieces). */
+  const flightCandidates = () =>
+    [...document.querySelectorAll<HTMLElement>('main [data-flight], main [data-continuum]')].filter((el) => flightName(el));
+
+  /** Names the incoming page offers as landing spots. */
+  function landingNames(newDoc: Document, from: URL): Set<string> {
+    const names = new Set([...newDoc.querySelectorAll<HTMLElement>('[data-flight]')].map((el) => el.dataset.flight!));
+    const id = postIdOf(from);
+    if (id) cardParts(newDoc, id).parts.forEach(({ name }) => names.add(name));
+    return names;
+  }
+
+  /* ---------- Header ---------- */
+
+  /*
+   * The header sits at the top of every page, so on screen it moves by
+   * exactly the change in scroll position. A new page starts at the top and
+   * going back restores the old position; if that changes the scroll by more
+   * than a few pixels, gliding would carry the name, menu and shapes in from
+   * (or off to) above the screen. Then they stay still instead.
+   */
+  // The site header only: a post page has its own <header> around the title.
+  const HEADER_PIECES = '[data-site-header] [data-astro-transition-scope]';
+  let headerGlides = true;
+
+  const HEADER_SCROLL_TOLERANCE = 24;
+
+  function scrollAfter(event: { navigationType: string }) {
+    if (event.navigationType !== 'traverse') return 0; // new pages start at the top
+    return (history.state as { scrollY?: number } | null)?.scrollY ?? 0;
+  }
+
+  function stillHeader(doc: Document) {
+    doc.querySelectorAll<HTMLElement>(HEADER_PIECES).forEach((el) => (el.style.viewTransitionName = 'none'));
   }
 
   /* ---------- Turnstile exit ---------- */
 
-  const ITEMS = 'main .feather, main [data-feather] > *, .sidebar > *';
+  const ITEMS = 'main .feather, main [data-feather] > *';
 
   function isOnScreen(el: Element) {
     const box = el.getBoundingClientRect();
     return box.height > 0 && box.bottom > 0 && box.top < innerHeight;
   }
 
-  /** Visible items, top to bottom, leaving out anything that will fly. */
-  function exitingItems(flying: HTMLElement[]): HTMLElement[] {
-    return [...document.querySelectorAll<HTMLElement>(ITEMS)]
-      .filter((el) => isOnScreen(el) && !flying.some((f) => el === f || el.contains(f)))
-      .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
-  }
-
-  async function playExit(back: boolean) {
-    const flying = flyingElements();
+  /** Swing elements away on their left-edge hinge, top first. */
+  function swingAway(elements: HTMLElement[], back: boolean, startIndex = 0) {
     const angle = back ? EXIT.angle : -EXIT.angle;
-
-    const swings = exitingItems(flying).map((el, i) => {
-      el.style.transformOrigin = '0 50%';
-      return el.animate(
-        [
-          { transform: 'perspective(800px) rotateY(0deg)', opacity: 1 },
-          { transform: `perspective(800px) rotateY(${angle}deg)`, opacity: 0 },
-        ],
-        {
-          duration: EXIT.duration,
-          delay: Math.min(i, EXIT.maxStagger) * EXIT.stagger,
-          easing: EXIT.easing,
-          fill: 'forwards',
-        },
-      ).finished;
-    });
-
-    const lifts = flying.map(
-      (el) => el.animate([{ transform: 'none' }, { transform: LIFT.transform }], { duration: LIFT.duration, easing: LIFT.easing, fill: 'forwards' }).finished,
-    );
-
-    await Promise.all([...swings, ...lifts]);
+    return elements
+      .filter(isOnScreen)
+      .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
+      .map((el, i) => {
+        el.style.transformOrigin = '0 50%';
+        return el.animate(
+          [
+            { transform: 'perspective(800px) rotateY(0deg)', opacity: 1 },
+            { transform: `perspective(800px) rotateY(${angle}deg)`, opacity: 0 },
+          ],
+          {
+            duration: EXIT.duration,
+            delay: Math.min(startIndex + i, EXIT.maxStagger) * EXIT.stagger,
+            easing: EXIT.easing,
+            fill: 'forwards',
+          },
+        ).finished;
+      });
   }
+
+  const lift = (elements: HTMLElement[]) =>
+    elements.map(
+      (el) =>
+        el.animate([{ transform: 'none' }, { transform: LIFT.transform }], {
+          duration: LIFT.duration,
+          easing: LIFT.easing,
+          fill: 'forwards',
+        }).finished,
+    );
 
   /* ---------- Wiring ---------- */
 
@@ -95,23 +141,60 @@
     const motion = motionFor(event.from, event.to);
     document.documentElement.dataset.motion = motion;
 
-    clearNames(document);
-    const id = postIdOf(event.to);
-    if (id) nameCard(document, id);
+    headerGlides = Math.abs(scrollY - scrollAfter(event)) < HEADER_SCROLL_TOLERANCE;
+    if (!headerGlides) stillHeader(document);
+
+    // Opening a post from a list: its card is the only one that may fly.
+    clearCardNames(document);
+    const toId = postIdOf(event.to);
+    if (toId) nameCard(document, toId);
 
     if (motion !== 'turnstile' || reducedMotion.matches) return;
 
-    // Let the items swing away while the next page loads; swap when both are done.
+    const back = event.direction === 'back';
+    const candidates = flightCandidates();
     const load = event.loader;
+
     event.loader = async () => {
-      await Promise.all([load(), playExit(event.direction === 'back')]);
+      // Everything that certainly doesn't fly starts swinging away now…
+      const others = [...document.querySelectorAll<HTMLElement>(ITEMS)].filter(
+        (el) => !candidates.some((c) => el === c || el.contains(c)),
+      );
+      const exits = swingAway(others, back);
+      await load();
+
+      // …and once the next page is known, pieces with a landing spot lift and
+      // fly; pieces without one lose their name and swing away too.
+      const landing = landingNames(event.newDocument, event.from);
+      const fliers = candidates.filter((el) => landing.has(flightName(el)!));
+      const stayers = candidates.filter((el) => !landing.has(flightName(el)!));
+      stayers.forEach((el) => (el.style.viewTransitionName = 'none'));
+      await Promise.all([...exits, ...swingAway(stayers, back), ...lift(fliers)]);
     };
   });
 
   document.addEventListener('astro:before-swap', (event) => {
+    const doc = event.newDocument;
     // Astro copies <html> attributes from the incoming page, so set it there too.
-    event.newDocument.documentElement.dataset.motion = document.documentElement.dataset.motion;
-    const id = postIdOf(event.from);
-    if (id) nameCard(event.newDocument, id);
+    doc.documentElement.dataset.motion = document.documentElement.dataset.motion;
+    if (!headerGlides) stillHeader(doc);
+
+    // Names still active on the outgoing page: the only possible partners.
+    const departing = new Set(
+      flightCandidates()
+        .map((el) => getComputedStyle(el).viewTransitionName)
+        .filter((name) => name !== 'none'),
+    );
+
+    // Returning to a list: the card of the post we came from flies home.
+    const fromId = postIdOf(event.from);
+    if (fromId) nameCard(doc, fromId, departing);
+
+    // A post page's pieces fly only if they have a partner; otherwise they
+    // drop their name and feather in with everything else.
+    doc.querySelectorAll<HTMLElement>('[data-flight]').forEach((el) => {
+      if (departing.has(el.dataset.flight!)) el.classList.add('flying');
+      else el.style.viewTransitionName = 'none';
+    });
   });
 </script>

@@ -109,6 +109,14 @@ html[data-motion='pivot-prev']::view-transition-new(sidebar) {
   animation: lv-pivot-in-left var(--duration-pivot-in) var(--ease-out-quint) var(--delay-pivot) both !important;
 }
 
+/*
+ * In a pivot the old sidebar only fades: sliding it left would carry it
+ * across the incoming page's main column.
+ */
+html[data-motion^='pivot']::view-transition-old(sidebar) {
+  animation: lv-fade-out var(--duration-fade) linear both !important;
+}
+
 /* ---------- Shared elements (continuum) ---------- */
 
 /* The site name, menu, titles and covers fly with a long, soft ease-out. */
@@ -193,11 +201,28 @@ html[data-motion='pivot-prev']::view-transition-new(sidebar) {
 [data-feather] > :nth-child(8) { --i: 7; }
 [data-feather] > :nth-child(n + 9) { --i: 8; }
 
-/* Elements that fly between pages must not also turn. */
-.feather[data-astro-transition-scope],
-[data-feather] > [data-astro-transition-scope],
-.continuum-target {
+/* Elements flying between pages this time (set by the director) don't also turn. */
+.feather.flying,
+[data-feather] > .flying {
   animation: none;
+}
+
+/*
+ * Header pieces that exist on only one side (the search button shows only
+ * where there is no sidebar) fade instead of popping.
+ */
+@keyframes lv-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+::view-transition-new(search-button):only-child {
+  animation: lv-fade-in var(--duration-feather) var(--ease-out-quint) both;
+}
+
+::view-transition-old(search-button):only-child {
+  animation: lv-fade-out var(--duration-fade) linear both;
 }
 
 /* A pivot slides whole sections; its items don't feather. */

@@ -22,7 +22,7 @@ const onSearchPage = Astro.url.pathname.startsWith('/search');
 const NameTag = variant === 'home' ? 'h1' : 'p';
 ---
 
-<header class:list={['header', variant]}>
+<header class:list={['header', variant]} data-site-header>
   <ZuneArt size={variant === 'home' ? 'large' : 'small'} />
   <div class="container inner">
     <div class="top">

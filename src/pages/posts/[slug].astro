@@ -59,13 +59,25 @@ const schema = [
   schema={schema}
 >
   <article class="article" data-pagefind-body data-pagefind-meta={`date:${shortDate(date)}`}>
-    <div data-pagefind-ignore transition:name={shared.date(post.id)}><PostDate date={date} /></div>
+    <div
+      class="feather"
+      data-pagefind-ignore
+      data-flight={shared.date(post.id)}
+      transition:name={shared.date(post.id)}
+    >
+      <PostDate date={date} />
+    </div>
     <div class="body">
       <header class="head" data-feather>
         {/* Only a real title flies; a note's hidden heading must not get a name. */}
         {
           title ? (
-            <h1 class="title" data-pagefind-meta="title" transition:name={shared.title(post.id)}>
+            <h1
+              class="title"
+              data-pagefind-meta="title"
+              data-flight={shared.title(post.id)}
+              transition:name={shared.title(post.id)}
+            >
               {heading}
             </h1>
           ) : (
@@ -85,7 +97,12 @@ const schema = [
       </header>
       {
         cover && (
-          <div class="cover" transition:name={shared.cover(post.id)}>
+          <div
+            class="cover feather"
+            style="--i: 2"
+            data-flight={shared.cover(post.id)}
+            transition:name={shared.cover(post.id)}
+          >
             <Image src={cover} alt={coverAlt ?? ''} width={1200} loading="eager" />
           </div>
         )
