@@ -13,7 +13,7 @@ export const SITE = {
    * The site's address. Canonical links, the sitemap, robots.txt, RSS and
    * structured data all use it. Change it here when the domain changes.
    */
-  url: 'https://personal-blog-afn.pages.dev',
+  url: 'https://lonevoice.pages.dev',
   /** Who publishes the site (the blog stays anonymous, so the site name). */
   publisher: 'Lone Voice',
   /** Default image for link previews (1200×630, in public/). */
