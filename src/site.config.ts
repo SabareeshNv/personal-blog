@@ -4,11 +4,11 @@
 export const SITE = {
   title: 'Lone Voice',
   /** Shown under the large title on the homepage. */
-  tagline: 'short notes, written down.',
+  tagline: 'ideas half formed, feelings half named.',
   /** Used for search engines and the RSS feed. */
-  description: 'Lone Voice: short notes, links and photos, newest first.',
+  description: 'lone voice | a personal blog for feelings and thoughts worth jotting down.',
   /** The text in the accent tile at the top of the homepage sidebar. */
-  intro: 'A quiet place for short notes on things worth writing down.',
+  intro: 'a quiet personal space for feelings and thoughts worth jotting down.',
   /**
    * The site's address. Canonical links, the sitemap, robots.txt, RSS and
    * structured data all use it. Change it here when the domain changes.
@@ -19,7 +19,7 @@ export const SITE = {
   /** Default image for link previews (1200×630, in public/). */
   socialImage: '/og-default.jpg',
   lang: 'en',
-  locale: 'en-GB',
+  locale: 'en-IN',
   /** Dates are shown in this time zone, whatever the reader's own. */
   timeZone: 'Asia/Kolkata',
   /** Posts per page on the homepage. */
