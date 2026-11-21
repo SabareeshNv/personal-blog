@@ -1,0 +1,47 @@
+---
+/**
+ * Windows Phone “continuum”: the post you open (or return from) flies
+ * between the timeline and the post page.
+ *
+ * The post page always names its date, title and cover. Timeline cards are
+ * only marked with `data-continuum`; this script gives the names to the one
+ * card involved in a navigation. Naming every card would make each post that
+ * appears on both of two lists fly across the screen.
+ */
+---
+
+<script>
+  import { shared } from '@/lib/motion';
+
+  type Part = keyof typeof shared;
+
+  const POST_PATH = /^\/posts\/([^/]+)\/?$/;
+  const postIdOf = (url: URL) => url.pathname.match(POST_PATH)?.[1];
+
+  /** Name the date, title and cover of the card for `id` in `doc`. */
+  function nameCard(doc: Document, id: string) {
+    const card = doc.querySelector<HTMLElement>(`[data-post-id="${CSS.escape(id)}"]`);
+    card?.querySelectorAll<HTMLElement>('[data-continuum]').forEach((el) => {
+      el.style.viewTransitionName = shared[el.dataset.continuum as Part](id);
+    });
+  }
+
+  function clearNames(doc: Document) {
+    doc.querySelectorAll<HTMLElement>('[data-continuum]').forEach((el) => {
+      el.style.viewTransitionName = '';
+    });
+  }
+
+  // Timeline → post: name the card being left behind.
+  document.addEventListener('astro:before-preparation', (event) => {
+    clearNames(document);
+    const id = postIdOf(event.to);
+    if (id) nameCard(document, id);
+  });
+
+  // Post → timeline: name the matching card on the incoming page.
+  document.addEventListener('astro:before-swap', (event) => {
+    const id = postIdOf(event.from);
+    if (id) nameCard(event.newDocument, id);
+  });
+</script>

@@ -6,6 +6,7 @@
  * two-column layout on large screens; without it the page is one column.
  */
 import BaseHead from '@/components/BaseHead.astro';
+import Continuum from '@/components/Continuum.astro';
 import SiteFooter from '@/components/SiteFooter.astro';
 import SiteHeader from '@/components/SiteHeader.astro';
 import { pageTurn, sideTurn } from '@/lib/motion';
@@ -44,6 +45,7 @@ const hasSidebar = Astro.slots.has('sidebar');
       }
     </div>
     <SiteFooter />
+    <Continuum />
   </body>
 </html>
 

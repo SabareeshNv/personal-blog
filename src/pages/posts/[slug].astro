@@ -39,16 +39,21 @@ const heading = displayTitle(post);
   type="article"
 >
   <article class="article" data-pagefind-body data-pagefind-meta={`date:${shortDate(date)}`}>
-    <div data-pagefind-ignore><PostDate date={date} name={shared.date(post.id)} /></div>
+    <div data-pagefind-ignore transition:name={shared.date(post.id)}><PostDate date={date} /></div>
     <div class="body">
       <header class="head">
-        <h1
-          class:list={['title', { 'visually-hidden': !title }]}
-          data-pagefind-meta="title"
-          transition:name={title ? shared.title(post.id) : undefined}
-        >
-          {heading}
-        </h1>
+        {/* Only a real title flies; a note's hidden heading must not get a name. */}
+        {
+          title ? (
+            <h1 class="title" data-pagefind-meta="title" transition:name={shared.title(post.id)}>
+              {heading}
+            </h1>
+          ) : (
+            <h1 class="title visually-hidden" data-pagefind-meta="title">
+              {heading}
+            </h1>
+          )
+        }
         <div data-pagefind-ignore><TagList tags={tags} /></div>
       </header>
       {

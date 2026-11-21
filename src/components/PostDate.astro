@@ -12,16 +12,16 @@ interface Props {
   href?: string;
   /** Position in the list, used to alternate the weekday colour. */
   index?: number;
-  /** Shared-element name, so the date flies between pages. */
-  name?: string;
+  /** On a timeline: may be given a shared name at navigation time. */
+  continuum?: boolean;
 }
 
-const { date, href, index = 0, name } = Astro.props;
+const { date, href, index = 0, continuum = false } = Astro.props;
 const { day, month, weekday, year } = dateParts(date);
 const Tag = href ? 'a' : 'div';
 ---
 
-<Tag class:list={['date', index % 2 ? 'pink' : 'orange']} href={href} transition:name={name}>
+<Tag class:list={['date', index % 2 ? 'pink' : 'orange']} href={href} data-continuum={continuum ? 'date' : undefined}>
   <time datetime={date.toISOString()}>
     <span class="visually-hidden">{fullDate(date)}</span>
     <span class="parts" aria-hidden="true">
