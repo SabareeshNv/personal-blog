@@ -68,7 +68,7 @@ Project memory for Claude. Read this before changing anything. Keep it current: 
   - **Titles and text:** titles are 32 px bold. Summaries are a softer grey (`--color-body`). Notes are 19 px regular.
   - **Footer row:** tags (pink, no boxes) sit on the left and "continue reading →" (**white**, not pink) on the right edge, in one row. The owner found the stacked, same-coloured version cluttered.
   - Hairlines separate posts.
-- **Other pages:** post (44 px title, prose, older/newer links), topics (tiles, the most-used topic gets the gradient), single topic, archive (year → month → rows), about, search, content and privacy policies (one shared layout), 404.
+- **Other pages:** post (44 px title, prose, older/newer links), topics (tiles ordered by post count, then name; the first gets the gradient, the second magenta, the 1st and 7th are double width; 2 columns on phones, 3 on tablet, 4 on desktop; `grid-auto-flow: dense` lets small tiles fill gaps beside wide ones; has the sidebar, like the homepage and archive, at the owner's request), single topic, archive (year → month → rows), about, search, content and privacy policies (one shared layout), 404.
 - **Footer:** an oversized faint "lone voice", the copyright line, and Content Policy / Privacy Policy links.
 
 ## Content model (`src/content.config.ts`)

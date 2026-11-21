@@ -1,6 +1,7 @@
 ---
 /** Every topic as a Windows Phone tile; the most-used get the biggest tiles. */
 import PageIntro from '@/components/PageIntro.astro';
+import Sidebar from '@/components/Sidebar.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getTopics, tagUrl } from '@/lib/posts';
 
@@ -29,12 +30,14 @@ const count = (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`;
       ))
     }
   </ul>
+  <Sidebar slot="sidebar" />
 </BaseLayout>
 
 <style>
   .tiles {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row dense; /* small tiles fill gaps left beside wide ones */
     gap: var(--space-2xs);
     margin-block-start: var(--space-m);
     padding: 0;
@@ -89,20 +92,32 @@ const count = (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`;
     overflow-wrap: break-word;
   }
 
+  /* Tablet: three tiles a row beside the narrow sidebar. */
   @media (width >= 48rem) {
     .tiles {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: var(--space-xs);
       margin-block-start: var(--space-xl);
     }
 
     .tile a {
-      height: 11.25rem;
-      padding: var(--space-s) 1.125rem;
+      height: 9rem;
     }
 
     .count {
       font-size: var(--text-xs);
+    }
+  }
+
+  /* Desktop: four tiles a row beside the full sidebar. */
+  @media (width >= 64rem) {
+    .tiles {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .tile a {
+      height: 11.25rem;
+      padding: var(--space-s) 1.125rem;
     }
 
     .name {
