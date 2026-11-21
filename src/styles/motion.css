@@ -16,13 +16,13 @@
   --ease-in: cubic-bezier(0.55, 0, 0.9, 0.4);
   --ease-out-quint: cubic-bezier(0.1, 0.9, 0.2, 1);
   /* All timings in one place (the turnstile exit's are in src/lib/motion.ts). */
-  --duration-morph: 0.495s; /* shared elements flying */
-  --duration-feather: 0.495s; /* each item turning in */
-  --stagger-feather: 50ms; /* gap between items */
-  --duration-fade: 0.11s; /* old column disappearing */
-  --duration-pivot-out: 0.22s;
-  --duration-pivot-in: 0.44s;
-  --delay-pivot: 0.088s;
+  --duration-morph: 0.6s; /* shared elements flying */
+  --duration-feather: 0.6s; /* each item turning in */
+  --stagger-feather: 60ms; /* gap between items */
+  --duration-fade: 0.13s; /* old column disappearing */
+  --duration-pivot-out: 0.26s;
+  --duration-pivot-in: 0.53s;
+  --delay-pivot: 0.1s;
   --hinge: perspective(800px);
 }
 
