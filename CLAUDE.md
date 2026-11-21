@@ -10,10 +10,12 @@ Project memory for Claude. Read this before changing anything. Keep it current: 
 - **Hosting:** Cloudflare Pages.
   - Build command `npm run build`, output folder `dist`, `NODE_VERSION=22`.
   - Every push to `main` rebuilds the live site in about a minute.
-- **Live address (temporary):** `https://personal-blog-afn.pages.dev`. The owner will move to a different domain later. The address is set in exactly **one** place: `url` in `src/site.config.ts`. Change it there and nowhere else.
+- **Live address:** `https://lonevoice.pages.dev` (the owner switched to it from `personal-blog-afn.pages.dev`). The address is set in exactly **one** place: `url` in `src/site.config.ts`. Change it there and nowhere else.
 - **History:** the project started in `SabareeshNv/Claude-microblog`. Its early commits contain an abandoned Malayalam version of the site. Ignore that repository: this repository is the only source of truth.
 
 ## How the owner works (follow these)
+
+- **The owner also edits the code on a laptop** and pushes to `main`. Always pull (`git pull --ff-only origin main`) before starting work.
 
 - **Design before code.** For new pages or visual changes, the owner approves a design first. That has been a Claude Design canvas: "Lone Voice — Zune design", https://claude.ai/artifact/VV3aN4Qhv2tNr5p5zyjMRY. Ask before building anything big that hasn't been designed.
 - **Short, plain explanations.** The owner isn't a developer. Explain changes in everyday words.
@@ -42,7 +44,7 @@ Project memory for Claude. Read this before changing anything. Keep it current: 
 
 - **Look:** black background, large thin lowercase type, the Windows Phone pivot menu (current item white, others grey), round outlined app-bar buttons, square tiles. Zune magenta accent `#d6006f`, a pink→orange gradient (`--gradient-zune`) and pink/orange weekday colours.
 - **Header** (`SiteHeader`, never animated between pages):
-  - On the homepage, a giant "lone voice" runs off the right edge, with the tagline "short notes, written down." underneath.
+  - On the homepage, a giant "lone voice" runs off the right edge, with the tagline underneath (`SITE.tagline`, currently "ideas half formed, feelings half named.").
   - Inner pages have a compact 64 px name.
   - Pink→orange angled shapes (`ZuneArt`) sit behind the name and fade to black on the left. On phones the shapes stay beside the name, clear of the menu.
   - No domain name is shown in the header (the owner asked to remove it).
@@ -181,7 +183,8 @@ public/                 favicon.svg, apple-touch-icon.png, og-default.jpg
 
 - **Waiting on the owner:**
   - Real content (posts, About, policies, intro text).
-  - The final domain (then resubmit the sitemap to Google Search Console and Bing).
+  - Submit `https://lonevoice.pages.dev/sitemap-index.xml` to Google Search Console and Bing (and again if a custom domain is added later).
+  - `public/og-default.jpg` (the link-preview image) still shows the old tagline "short notes, written down."; regenerate it if the owner wants it to match.
   - Checking motion on the iPhone.
 - **Offered but not chosen yet:**
   - `public/_headers` for long cache times and security headers.
