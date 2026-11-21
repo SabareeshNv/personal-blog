@@ -26,8 +26,10 @@ Project memory for Claude. Read this before changing anything. Keep it current: 
 - **No Tailwind, no CSS framework.** The owner explicitly switched from Tailwind 4 to hand-written modern CSS: grid, flexbox, custom properties and logical properties.
 - **Co-located Astro components.** Each component keeps its markup, scoped `<style>` and `<script>` in one `.astro` file. Global CSS is only `tokens.css`, `global.css` (a reset plus `.container` and `.visually-hidden`) and `motion.css`.
 - **Mobile first, three sizes.** Base styles (no media query) are the **mobile** layout, under 48rem (768 px). Two breakpoints switch to the larger sizes:
-  - `@media (width >= 48rem)`: **tablet**, 768–1023 px. One column, the stacked date block, larger type, 240 px thumbnails.
-  - `@media (width >= 64rem)`: **desktop**, 1024 px and up. Two columns with a sticky sidebar.
+  - `@media (width >= 48rem)`: **tablet**, 768–1023 px. Two columns: the posts plus a **narrow 240 px sidebar** (32 px gap), stacked date block in an 80 px column (48 px day), 26 px post titles, 36 px article titles, 120 px **square** thumbnails, smaller sidebar type. (The owner chose this, "Option B", from the canvas; a full-width version with the sidebar below was rejected because the sidebar items didn't line up.)
+  - `@media (width >= 64rem)`: **desktop**, 1024 px and up. Two columns with the full 320 px sidebar (64 px gap), 96 px date column, 32 px titles, 240×170 thumbnails.
+
+  Tablet and desktop values are tokens that change at 48rem and again at 64rem (`--width-side`, `--gap-columns`, `--size-date-column`, `--text-date-day`, `--space-post-gutter`, `--size-thumb`, `--ratio-thumb`, `--text-post-title`, `--text-article-title`, `--text-side-heading`, `--text-side-tile`, `--size-side-tile`), so components mostly don't need their own media queries.
 
   The owner expects mobile, tablet and desktop to be distinct. Don't add another size without asking; a large-desktop or small-phone size has been offered but not chosen.
 - **Tokens only.** Colours, font sizes, spacing and widths come from `src/styles/tokens.css`. Never hard-code a value a token exists for. Some tokens change value at 48rem, so components often need no media query.
@@ -45,9 +47,10 @@ Project memory for Claude. Read this before changing anything. Keep it current: 
   - Pink→orange angled shapes (`ZuneArt`) sit behind the name and fade to black on the left. On phones the shapes stay beside the name, clear of the menu.
   - No domain name is shown in the header (the owner asked to remove it).
 - **Menu:** posts · topics · archive · about. There is **no "photos"** item (the owner removed it). On phones the menu scrolls sideways, with a fade at the right edge and a spacer after the last item.
-- **Search button** (round, in the header): shown on phones, and on desktop only on pages without a sidebar.
+- **Search button** (round, in the header): shown on phones; on tablet and desktop only on pages without a sidebar (the sidebar has a search box).
 - **Layout:**
   - Desktop has two columns: the main column (760 px) and a sticky sidebar (320 px), 64 px apart, 1200 px maximum width.
+  - Tablet has two columns too: the main column takes the rest, the sticky sidebar is 240 px, 32 px apart.
   - Phones have one column, with the sidebar below the content.
   - The gap below the header is 88 px on desktop and 48 px on phones (`--space-header`); the owner asked for more breathing room.
 - **Sidebar contents and order:**
@@ -59,7 +62,7 @@ Project memory for Claude. Read this before changing anything. Keep it current: 
   The owner rejected repeating the menu items in the sidebar, and rejected "recent covers".
 - **Timeline** (`PostCard`): one column, newest first.
   - **Date block:** on tablet and desktop it's a vertical stack (small "NOV", 60 px thin "21", weekday in orange or pink alternately, then the year) with a thin divider before the post. On phones it's **one small line** ("21 NOV 2026 · SAT", 12 px semibold). The owner found the big date on phones squeezed the text and distracted from the title.
-  - **Covers:** shown as a thumbnail beside the text (240×170 on tablet and desktop, an 84 px square on phones). Only photo posts (a cover with no title) show it full width.
+  - **Covers:** shown as a thumbnail beside the text (240×170 on desktop, a 120 px square on tablet, an 84 px square on phones). Only photo posts (a cover with no title) show it full width.
   - **Titles and text:** titles are 32 px bold. Summaries are a softer grey (`--color-body`). Notes are 19 px regular.
   - **Footer row:** tags (pink, no boxes) sit on the left and "continue reading →" (**white**, not pink) on the right edge, in one row. The owner found the stacked, same-coloured version cluttered.
   - Hairlines separate posts.

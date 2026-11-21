@@ -69,7 +69,7 @@ const hasSidebar = Astro.slots.has('sidebar');
     max-width: var(--width-main);
   }
 
-  /* Phones and tablets: the sidebar follows the main content. */
+  /* Phones: the sidebar follows the main content. */
   .sidebar {
     display: flex;
     flex-direction: column;
@@ -77,7 +77,8 @@ const hasSidebar = Astro.slots.has('sidebar');
     margin-block-start: var(--space-2xl);
   }
 
-  @media (width >= 64rem) {
+  /* Tablet and desktop: posts and sidebar side by side (sizes from tokens). */
+  @media (width >= 48rem) {
     .with-sidebar {
       display: grid;
       grid-template-columns: minmax(0, var(--width-main)) var(--width-side);

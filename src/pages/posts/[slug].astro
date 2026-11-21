@@ -219,12 +219,12 @@ const schema = [
   @media (width >= 48rem) {
     .article {
       display: grid;
-      grid-template-columns: 6rem minmax(0, 1fr);
+      grid-template-columns: var(--size-date-column) minmax(0, 1fr);
     }
 
     .body {
       margin: 0;
-      padding-inline-start: var(--space-l);
+      padding-inline-start: var(--space-post-gutter);
       border-left: var(--border-thin);
     }
 

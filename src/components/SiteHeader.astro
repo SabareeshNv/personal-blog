@@ -109,6 +109,11 @@ const NameTag = variant === 'home' ? 'h1' : 'p';
   }
 
   @media (width >= 48rem) {
+    /* Tablet and desktop pages with a sidebar have a search box there. */
+    .mobile-only {
+      display: none;
+    }
+
     .inner {
       padding-block-start: var(--space-xl);
     }
@@ -127,10 +132,6 @@ const NameTag = variant === 'home' ? 'h1' : 'p';
   }
 
   @media (width >= 64rem) {
-    .mobile-only {
-      display: none;
-    }
-
     .home .search:not(.mobile-only) {
       position: absolute;
       top: var(--space-xl);

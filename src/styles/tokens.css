@@ -4,8 +4,10 @@
  *
  * Mobile first: the base values suit phones. Larger screens override a few
  * of them at the two breakpoints used everywhere on the site:
- *   48rem (768px)  — tablet: vertical date blocks, larger type
- *   64rem (1024px) — desktop: two columns with the sidebar
+ *   under 48rem    — mobile: one column, sidebar below the posts
+ *   48rem (768px)  — tablet: two columns with a narrow (240px) sidebar,
+ *                    vertical date blocks, compact post sizes
+ *   64rem (1024px) — desktop: two columns with the full (320px) sidebar
  */
 :root {
   /*
@@ -80,6 +82,15 @@
   --size-touch: 2.75rem; /* 44 — smallest tap target */
   --size-thumb: 5.25rem; /* 84 — cover thumbnail on phones */
   --border-thin: 1px solid var(--color-line);
+
+  /* Timeline and sidebar sizes that differ between tablet and desktop. */
+  --size-date-column: 6rem; /* 96 — date block column (tablet and up) */
+  --text-date-day: 3.75rem; /* 60 — the big day number */
+  --space-post-gutter: var(--space-l); /* between divider and post text */
+  --ratio-thumb: 1; /* cover thumbnail shape: square on phones and tablets */
+  --text-side-heading: var(--text-3xl); /* sidebar headings: search, pinned */
+  --text-side-tile: var(--text-2xl); /* intro tile text, pinned title */
+  --size-side-tile: 12.5rem; /* 200 — intro tile height */
 }
 
 @media (width >= 48rem) {
@@ -92,6 +103,36 @@
     --text-display: 11rem; /* 176 */
     --space-header: 5.5rem; /* 88 */
     --space-post: 2.5rem; /* 40 */
+
+    /* Tablet: posts share the width with a narrow sidebar. */
+    --text-post-title: 1.625rem; /* 26 */
+    --text-article-title: 2.25rem; /* 36 */
+    --size-thumb: 7.5rem; /* 120, square */
+    --width-side: 15rem; /* 240 */
+    --gap-columns: 2rem; /* 32 */
+    --size-date-column: 5rem; /* 80 */
+    --text-date-day: 3rem; /* 48 */
+    --space-post-gutter: 1.25rem; /* 20 */
+    --text-side-heading: 1.625rem; /* 26 */
+    --text-side-tile: 1.25rem; /* 20 */
+    --size-side-tile: 10rem; /* 160 */
+  }
+}
+
+@media (width >= 64rem) {
+  :root {
+    /* Desktop: the full-size timeline and sidebar. */
+    --text-post-title: 2rem; /* 32 */
+    --text-article-title: 2.75rem; /* 44 */
     --size-thumb: 15rem; /* 240 */
+    --ratio-thumb: 24 / 17; /* 240 × 170 */
+    --width-side: 20rem; /* 320 */
+    --gap-columns: 4rem; /* 64 */
+    --size-date-column: 6rem; /* 96 */
+    --text-date-day: 3.75rem; /* 60 */
+    --space-post-gutter: var(--space-l); /* 32 */
+    --text-side-heading: var(--text-3xl); /* 30 */
+    --text-side-tile: var(--text-2xl); /* 24 */
+    --size-side-tile: 12.5rem; /* 200 */
   }
 }

@@ -148,7 +148,7 @@ const { Content } = !title ? await render(post) : { Content: null };
 
   .thumb img {
     width: 100%;
-    aspect-ratio: 1;
+    aspect-ratio: var(--ratio-thumb);
     object-fit: cover;
   }
 
@@ -177,7 +177,7 @@ const { Content } = !title ? await render(post) : { Content: null };
   @media (width >= 48rem) {
     .post {
       display: grid;
-      grid-template-columns: 6rem minmax(0, 1fr);
+      grid-template-columns: var(--size-date-column) minmax(0, 1fr);
       padding-block: 0;
     }
 
@@ -188,12 +188,12 @@ const { Content } = !title ? await render(post) : { Content: null };
     .body {
       gap: var(--space-s);
       margin: 0;
-      padding: var(--space-post) 0 var(--space-xl) var(--space-l);
+      padding: var(--space-post) 0 var(--space-xl) var(--space-post-gutter);
       border-left: var(--border-thin);
     }
 
     .titled.has-thumb {
-      gap: var(--space-l);
+      gap: var(--space-post-gutter);
     }
 
     .text {
@@ -205,9 +205,6 @@ const { Content } = !title ? await render(post) : { Content: null };
       font-size: var(--text-l);
     }
 
-    .thumb img {
-      aspect-ratio: 24 / 17;
-    }
 
     .note {
       font-size: var(--text-xl);
