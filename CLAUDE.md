@@ -128,7 +128,7 @@ Built on Astro's `<ClientRouter />` (in `BaseHead.astro`), so pages swap without
 ## SEO (`BaseHead.astro`, `src/lib/seo.ts`)
 
 - **Every page:** unique title and description, canonical link, `robots` meta, Open Graph and Twitter tags.
-- **Link-preview images:** 1200×630 — covers are cropped with `getImage`; other pages use `public/og-default.jpg`.
+- **Link-preview images:** 1200×630 — covers are cropped with `getImage`; other pages use `public/og-default.jpg`. That image shows "lone voice" and the tagline; regenerate it whenever `SITE.tagline` changes (render an HTML page with Open Sans 300 and the Zune shapes at 1200×630 in Playwright, then save as JPEG).
 - **Clean URLs:** `trailingSlash: 'always'`.
 - **Structured data (JSON-LD):** `WebSite` with a `SearchAction` on page 1, `BlogPosting` and `BreadcrumbList` on posts, breadcrumbs on topic pages.
 - **Crawling:**
@@ -184,7 +184,6 @@ public/                 favicon.svg, apple-touch-icon.png, og-default.jpg
 - **Waiting on the owner:**
   - Real content (posts, About, policies, intro text).
   - Submit `https://lonevoice.pages.dev/sitemap-index.xml` to Google Search Console and Bing (and again if a custom domain is added later).
-  - `public/og-default.jpg` (the link-preview image) still shows the old tagline "short notes, written down."; regenerate it if the owner wants it to match.
   - Checking motion on the iPhone.
 - **Offered but not chosen yet:**
   - `public/_headers` for long cache times and security headers.
