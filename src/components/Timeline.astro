@@ -1,0 +1,26 @@
+---
+import type { Post } from '@/lib/posts';
+import PostCard from './PostCard.astro';
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="timeline">
+  {posts.map((post, index) => <PostCard post={post} index={index} />)}
+</div>
+
+<style>
+  .timeline > :global(:first-child) {
+    padding-block-start: 0;
+  }
+
+  @media (width >= 48rem) {
+    .timeline > :global(:first-child) > :global(*) {
+      padding-block-start: 0;
+    }
+  }
+</style>

@@ -1,0 +1,34 @@
+---
+import RoundButton from '@/components/RoundButton.astro';
+import PageLayout from '@/layouts/PageLayout.astro';
+import { SITE } from '@/site.config';
+---
+
+<PageLayout title="About" description={`About ${SITE.title}.`} hideTitle>
+  <p class="intro" slot="lead">{SITE.intro}</p>
+
+  <p>
+    [Why this blog exists, what kind of posts to expect, and how often. Replace this text in
+    <code>src/pages/about.astro</code>.]
+  </p>
+  <p>[Anything else readers should know. This blog stays anonymous: no name or photo, just the writing.]</p>
+
+  <h2>Follow along</h2>
+  <RoundButton href="/rss.xml" icon="rss" text="subscribe with RSS" />
+</PageLayout>
+
+<style>
+  .intro {
+    margin-block-end: var(--space-l);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-light);
+    line-height: 1.4;
+  }
+
+  @media (width >= 48rem) {
+    .intro {
+      margin-block-end: var(--space-xl);
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

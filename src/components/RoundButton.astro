@@ -1,0 +1,61 @@
+---
+/**
+ * The round outlined Windows Phone app-bar button: an icon in a circle,
+ * optionally followed by a text label.
+ */
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  href: string;
+  icon: IconName;
+  /** Visible text beside the circle. Without it, `label` names the button. */
+  text?: string;
+  label?: string;
+  current?: boolean;
+}
+
+const { href, icon, text, label, current = false } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={['round', { current }]}
+  aria-label={text ? undefined : label}
+  aria-current={current ? 'page' : undefined}
+>
+  <span class="circle"><Icon name={icon} size={18} /></span>
+  {text && <span class="text">{text}</span>}
+</a>
+
+<style>
+  .round {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-l);
+    font-weight: var(--weight-light);
+  }
+
+  .round:hover {
+    text-decoration: none;
+  }
+
+  .circle {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: var(--size-touch);
+    height: var(--size-touch);
+    border: 2px solid var(--color-fg);
+    border-radius: 50%;
+    background: var(--color-bg);
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .round:hover .circle,
+  .current .circle {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+</style>

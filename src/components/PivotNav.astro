@@ -1,0 +1,72 @@
+---
+/**
+ * The Windows Phone “pivot” menu: large light words, the current page in
+ * full colour and the others greyed out.
+ */
+import { NAV } from '@/site.config';
+
+/** First segment of the current URL, e.g. "topics" for /topics/design/. */
+const section = Astro.url.pathname.split('/').filter(Boolean)[0] ?? '';
+const isCurrent = (match: string) => (match === '' ? section === '' || section === 'posts' : section === match);
+---
+
+<nav aria-label="Sections">
+  <ul>
+    {
+      NAV.map((item) => (
+        <li>
+          <a href={item.href} aria-current={isCurrent(item.match) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  /* Phones: one row that scrolls sideways, like a Windows Phone pivot. */
+  ul {
+    display: flex;
+    gap: 0 var(--space-m);
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-pivot);
+    font-weight: var(--weight-light);
+    letter-spacing: -0.02em;
+  }
+
+  a {
+    display: block;
+    padding-block: var(--space-2xs) var(--space-xs);
+    color: var(--color-muted);
+  }
+
+  a[aria-current='page'] {
+    color: var(--color-fg);
+  }
+
+  a:hover {
+    color: var(--color-fg);
+    text-decoration: none;
+  }
+
+  ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (width >= 48rem) {
+    ul {
+      flex-wrap: wrap;
+      gap: 0 var(--space-l);
+      overflow-x: visible;
+    }
+
+    a {
+      padding-block-end: var(--space-s);
+    }
+  }
+</style>

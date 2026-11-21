@@ -1,0 +1,109 @@
+---
+/** Every topic as a Windows Phone tile; the most-used get the biggest tiles. */
+import PageIntro from '@/components/PageIntro.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getTopics, tagUrl } from '@/lib/posts';
+
+const topics = await getTopics();
+const count = (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`;
+---
+
+<BaseLayout title="Topics" description="Every topic on Lone Voice.">
+  <PageIntro
+    title="Topics"
+    hidden
+    lede="Every tag used on Lone Voice. The most-used topics get the biggest tiles."
+  />
+  <ul class="tiles">
+    {
+      topics.map((topic, i) => (
+        <li class:list={['tile', { wide: i === 0 || i === 6, featured: i === 0, accent: i === 1 }]}>
+          <a href={tagUrl(topic.name)}>
+            <span class="count">{count(topic.posts.length)}</span>
+            <span class="name">#{topic.name}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2xs);
+    margin-block-start: var(--space-m);
+    padding: 0;
+    list-style: none;
+  }
+
+  .tile a {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 7.5rem;
+    padding: var(--space-s);
+    background: var(--color-tile);
+  }
+
+  .tile a:hover {
+    text-decoration: none;
+    outline: 2px solid var(--color-accent-text);
+    outline-offset: -2px;
+  }
+
+  .wide {
+    grid-column: span 2;
+  }
+
+  .featured a {
+    background: var(--gradient-zune);
+    color: var(--color-on-accent);
+  }
+
+  .accent a {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .count {
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    color: var(--color-muted);
+  }
+
+  .featured .count,
+  .accent .count {
+    color: inherit;
+  }
+
+  .name {
+    font-size: 1.75rem;
+    font-weight: var(--weight-light);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    overflow-wrap: break-word;
+  }
+
+  @media (width >= 48rem) {
+    .tiles {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-xs);
+      margin-block-start: var(--space-xl);
+    }
+
+    .tile a {
+      height: 11.25rem;
+      padding: var(--space-s) 1.125rem;
+    }
+
+    .count {
+      font-size: var(--text-xs);
+    }
+
+    .name {
+      font-size: 2rem;
+    }
+  }
+</style>

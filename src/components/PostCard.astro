@@ -1,0 +1,186 @@
+---
+/**
+ * One post on a timeline. Its shape depends on what the post has:
+ * - title (+ cover)  → title, summary and tags, with the cover as a thumbnail
+ * - cover, no title  → a photo post: the picture full width, then the text
+ * - neither          → a note: the full text
+ */
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import { isPhoto, postUrl, summary, type Post } from '@/lib/posts';
+import Icon from './Icon.astro';
+import PostDate from './PostDate.astro';
+import TagList from './TagList.astro';
+
+interface Props {
+  post: Post;
+  index?: number;
+}
+
+const { post, index = 0 } = Astro.props;
+const { title, cover, coverAlt, tags, date } = post.data;
+const url = postUrl(post);
+const photo = isPhoto(post);
+const { Content } = !title ? await render(post) : { Content: null };
+---
+
+<article class="post">
+  <PostDate date={date} href={url} index={index} />
+  <div class="body">
+    {
+      title ? (
+        <div class:list={['titled', { 'has-thumb': cover }]}>
+          <div class="text">
+            <h2 class="title">
+              <a href={url}>{title}</a>
+            </h2>
+            <p class="summary">{summary(post)}</p>
+            <a class="more" href={url}>
+              continue reading <Icon name="arrow-right" size={16} />
+            </a>
+          </div>
+          {cover && (
+            <a class="thumb" href={url} tabindex="-1" aria-hidden="true">
+              <Image src={cover} alt="" width={480} />
+            </a>
+          )}
+        </div>
+      ) : photo && cover ? (
+        <>
+          <a class="photo" href={url}>
+            <Image src={cover} alt={coverAlt ?? ''} width={1200} />
+          </a>
+          <div class="caption">{Content && <Content />}</div>
+        </>
+      ) : (
+        <div class="note">{Content && <Content />}</div>
+      )
+    }
+    <TagList tags={tags} />
+  </div>
+</article>
+
+<style>
+  .post {
+    padding-block: var(--space-post);
+    border-bottom: var(--border-thin);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-2xs);
+  }
+
+  .titled.has-thumb {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--size-thumb);
+    gap: var(--space-xs);
+    align-items: start;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .title {
+    font-size: var(--text-post-title);
+    font-weight: var(--weight-bold);
+    letter-spacing: -0.015em;
+  }
+
+  .summary,
+  .caption {
+    font-size: var(--text-m);
+    color: var(--color-body);
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    align-self: flex-start;
+    font-size: var(--text-s);
+    font-weight: var(--weight-bold);
+    color: var(--color-accent-text);
+  }
+
+  .thumb,
+  .photo {
+    display: block;
+    overflow: hidden;
+    background: var(--color-tile);
+  }
+
+  .thumb img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  .photo img {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .note {
+    font-size: var(--text-l);
+  }
+
+  .note :global(p + p),
+  .caption :global(p + p) {
+    margin-block-start: var(--space-xs);
+  }
+
+  .note :global(a),
+  .caption :global(a) {
+    color: var(--color-accent-text);
+    text-decoration: underline;
+  }
+
+  /* Tablets and up: date block on the left, a thin divider, then the post. */
+  @media (width >= 48rem) {
+    .post {
+      display: grid;
+      grid-template-columns: 6rem minmax(0, 1fr);
+      padding-block: 0;
+    }
+
+    .post > :global(.date) {
+      padding-block: var(--space-post);
+    }
+
+    .body {
+      gap: var(--space-s);
+      margin: 0;
+      padding: var(--space-post) 0 var(--space-xl) var(--space-l);
+      border-left: var(--border-thin);
+    }
+
+    .titled.has-thumb {
+      gap: var(--space-l);
+    }
+
+    .text {
+      gap: var(--space-s);
+    }
+
+    .summary,
+    .caption {
+      font-size: var(--text-l);
+    }
+
+    .thumb img {
+      aspect-ratio: 24 / 17;
+    }
+
+    .note {
+      font-size: var(--text-xl);
+      padding-block-start: var(--space-xs);
+    }
+  }
+</style>

@@ -1,0 +1,141 @@
+---
+/** Every post, by year and month: one row each with its date and title. */
+import Sidebar from '@/components/Sidebar.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { dateParts } from '@/lib/format';
+import { displayTitle, getPosts, groupByYearAndMonth, postUrl } from '@/lib/posts';
+
+const years = groupByYearAndMonth(await getPosts());
+---
+
+<BaseLayout title="Archive" description="Every post on Lone Voice, by month.">
+  <h1 class="visually-hidden">Archive</h1>
+  {
+    years.map(({ year, months }, i) => (
+      <section class="year" aria-labelledby={`year-${year}`}>
+        <h2 id={`year-${year}`} class:list={['year-title', { past: i > 0 }]}>
+          {year}
+        </h2>
+        {months.map(({ month, posts }) => (
+          <section class="month" aria-label={`${month} ${year}`}>
+            <h3 class="month-title">{month}</h3>
+            <ul class="rows">
+              {posts.map((post) => {
+                const { day, month: mon } = dateParts(post.data.date);
+                return (
+                  <li>
+                    <a href={postUrl(post)}>
+                      <time datetime={post.data.date.toISOString()}>
+                        {day} {mon}
+                      </time>
+                      <span class:list={['name', { untitled: !post.data.title }]}>{displayTitle(post)}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
+      </section>
+    ))
+  }
+  <Sidebar slot="sidebar" />
+</BaseLayout>
+
+<style>
+  .year + .year {
+    margin-block-start: var(--space-2xl);
+  }
+
+  .year-title {
+    margin-inline-start: -0.04em;
+    font-size: var(--text-page-title);
+    font-weight: var(--weight-light);
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .past {
+    color: var(--color-muted);
+  }
+
+  .month {
+    margin-block-start: var(--space-l);
+  }
+
+  .month-title {
+    margin-block-end: var(--space-xs);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-light);
+  }
+
+  .rows {
+    padding: 0;
+    list-style: none;
+    border-top: var(--border-thin);
+  }
+
+  .rows li {
+    border-bottom: var(--border-thin);
+  }
+
+  .rows a {
+    display: flex;
+    gap: var(--space-s);
+    align-items: baseline;
+    padding-block: 0.875rem;
+  }
+
+  .rows a:hover {
+    text-decoration: none;
+  }
+
+  .rows a:hover .name {
+    text-decoration: underline;
+  }
+
+  time {
+    flex-shrink: 0;
+    width: 3.25rem;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-caps);
+    color: var(--color-muted);
+  }
+
+  .name {
+    font-size: var(--text-m);
+    font-weight: var(--weight-bold);
+    line-height: 1.45;
+  }
+
+  .untitled {
+    font-weight: var(--weight-regular);
+    color: var(--color-body);
+  }
+
+  @media (width >= 48rem) {
+    .month {
+      margin-block-start: var(--space-xl);
+    }
+
+    .month-title {
+      margin-block-end: var(--space-s);
+      font-size: var(--text-3xl);
+    }
+
+    .rows a {
+      gap: var(--space-m);
+      padding-block: var(--space-s);
+    }
+
+    time {
+      width: 4rem;
+      font-size: var(--text-xs);
+    }
+
+    .name {
+      font-size: 1.125rem;
+    }
+  }
+</style>

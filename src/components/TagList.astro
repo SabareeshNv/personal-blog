@@ -1,0 +1,36 @@
+---
+import { tagUrl } from '@/lib/posts';
+
+interface Props {
+  tags: string[];
+}
+
+const { tags } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <ul class="tags" aria-label="Topics">
+      {tags.map((tag) => (
+        <li>
+          <a href={tagUrl(tag)}>#{tag}</a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs) var(--space-s);
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-s);
+  }
+
+  a {
+    color: var(--color-accent-text);
+  }
+</style>

@@ -1,0 +1,159 @@
+---
+/** A single post: date block, title, tags, cover, text, then older/newer links. */
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import PostDate from '@/components/PostDate.astro';
+import Prose from '@/components/Prose.astro';
+import Sidebar from '@/components/Sidebar.astro';
+import TagList from '@/components/TagList.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { shortDate } from '@/lib/format';
+import { displayTitle, excerpt, getPosts, postUrl, type Post } from '@/lib/posts';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, newer: posts[i - 1], older: posts[i + 1] },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  post: Post;
+  newer?: Post;
+  older?: Post;
+}
+
+const { post, newer, older } = Astro.props;
+const { title, cover, coverAlt, tags, date, description } = post.data;
+const { Content } = await render(post);
+const heading = displayTitle(post);
+---
+
+<BaseLayout
+  title={heading}
+  description={description ?? excerpt(post)}
+  image={cover?.src}
+  type="article"
+>
+  <article class="article" data-pagefind-body data-pagefind-meta={`date:${shortDate(date)}`}>
+    <div data-pagefind-ignore><PostDate date={date} /></div>
+    <div class="body">
+      <header class="head">
+        <h1 class:list={['title', { 'visually-hidden': !title }]} data-pagefind-meta="title">{heading}</h1>
+        <div data-pagefind-ignore><TagList tags={tags} /></div>
+      </header>
+      {
+        cover && (
+          <Image class="cover" src={cover} alt={coverAlt ?? ''} width={1200} loading="eager" />
+        )
+      }
+      <Prose><Content /></Prose>
+
+      <nav class="pager" aria-label="More posts" data-pagefind-ignore>
+        {
+          older && (
+            <a class="older" href={postUrl(older)}>
+              <span class="label">← older · {shortDate(older.data.date)}</span>
+              <span class="name">{displayTitle(older)}</span>
+            </a>
+          )
+        }
+        {
+          newer && (
+            <a class="newer" href={postUrl(newer)}>
+              <span class="label">newer · {shortDate(newer.data.date)} →</span>
+              <span class="name">{displayTitle(newer)}</span>
+            </a>
+          )
+        }
+      </nav>
+    </div>
+  </article>
+  <Sidebar slot="sidebar" />
+</BaseLayout>
+
+<style>
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    margin-block-start: var(--space-xs);
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .title {
+    font-size: var(--text-article-title);
+    font-weight: var(--weight-bold);
+    letter-spacing: -0.02em;
+  }
+
+  .cover {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: var(--color-tile);
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--space-m);
+    margin-block-start: var(--space-xl);
+    padding-block-start: var(--space-l);
+    border-top: var(--border-thin);
+  }
+
+  .pager a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .pager a:hover {
+    text-decoration: none;
+  }
+
+  .pager a:hover .name {
+    text-decoration: underline;
+  }
+
+  .newer {
+    grid-column: -2;
+    text-align: end;
+  }
+
+  .label {
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+
+  .name {
+    font-size: var(--text-l);
+    font-weight: var(--weight-bold);
+    line-height: 1.35;
+  }
+
+  @media (width >= 48rem) {
+    .article {
+      display: grid;
+      grid-template-columns: 6rem minmax(0, 1fr);
+    }
+
+    .body {
+      margin: 0;
+      padding-inline-start: var(--space-l);
+      border-left: var(--border-thin);
+    }
+
+    .head {
+      gap: var(--space-s);
+    }
+  }
+</style>

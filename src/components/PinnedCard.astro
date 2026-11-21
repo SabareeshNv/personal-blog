@@ -1,0 +1,70 @@
+---
+/** The pinned post in the sidebar, on the Zune pink-to-orange card. */
+import { shortDate } from '@/lib/format';
+import { displayTitle, postUrl, summary, type Post } from '@/lib/posts';
+import Icon from './Icon.astro';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+---
+
+<section aria-labelledby="pinned-heading">
+  <h2 id="pinned-heading" class="heading">pinned</h2>
+  <a class="card" href={postUrl(post)}>
+    <span class="meta">
+      <Icon name="pin" size={14} />
+      <time datetime={post.data.date.toISOString()}>{shortDate(post.data.date)}</time>
+    </span>
+    <span class="title">{displayTitle(post)}</span>
+    {post.data.title && <span class="summary">{summary(post)}</span>}
+  </a>
+</section>
+
+<style>
+  .heading {
+    margin-block-end: var(--space-s);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-light);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    padding: var(--space-m);
+    background: var(--gradient-zune);
+    color: var(--color-on-accent);
+  }
+
+  .card:hover {
+    text-decoration: none;
+  }
+
+  .card:hover .title {
+    text-decoration: underline;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    line-height: 1.25;
+  }
+
+  .summary {
+    font-size: var(--text-s);
+    line-height: 1.55;
+  }
+</style>

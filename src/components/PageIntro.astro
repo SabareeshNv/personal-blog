@@ -1,0 +1,59 @@
+---
+/**
+ * The large thin title at the top of an inner page, with an optional
+ * back link above it and a short line of text below.
+ */
+interface Props {
+  title: string;
+  lede?: string;
+  back?: { href: string; label: string };
+  /** Hide the title visually (when the pivot menu already names the page). */
+  hidden?: boolean;
+}
+
+const { title, lede, back, hidden = false } = Astro.props;
+---
+
+<div class="intro">
+  {back && <a class="back" href={back.href}>← {back.label}</a>}
+  <h1 class:list={['title', { 'visually-hidden': hidden }]}>{title}</h1>
+  {lede && <p class="lede">{lede}</p>}
+  <slot />
+</div>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-block-end: var(--space-xs);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+
+  .title {
+    margin-inline-start: -0.04em;
+    font-size: var(--text-page-title);
+    font-weight: var(--weight-light);
+    line-height: 1.05;
+    letter-spacing: var(--tracking-display);
+    overflow-wrap: anywhere;
+  }
+
+  .lede {
+    margin-block-start: var(--space-xs);
+    font-size: var(--text-m);
+    font-weight: var(--weight-light);
+    color: var(--color-muted);
+  }
+
+  /* Only the visible title pushes the lede down. */
+  .visually-hidden + .lede {
+    margin-block-start: 0;
+  }
+
+  @media (width >= 48rem) {
+    .lede {
+      margin-block-start: var(--space-s);
+      font-size: 1.25rem;
+    }
+  }
+</style>

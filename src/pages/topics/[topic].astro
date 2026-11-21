@@ -1,0 +1,44 @@
+---
+/** One topic: its name in large type, then its posts on the timeline. */
+import type { GetStaticPaths } from 'astro';
+import PageIntro from '@/components/PageIntro.astro';
+import Sidebar from '@/components/Sidebar.astro';
+import Timeline from '@/components/Timeline.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getTopics, type Topic } from '@/lib/posts';
+
+export const getStaticPaths = (async () => {
+  return (await getTopics()).map((topic) => ({ params: { topic: topic.slug }, props: { topic } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  topic: Topic;
+}
+
+const { topic } = Astro.props;
+const n = topic.posts.length;
+---
+
+<BaseLayout title={`#${topic.name}`} description={`Posts about ${topic.name} on Lone Voice.`}>
+  <PageIntro
+    title={`#${topic.name}`}
+    back={{ href: '/topics/', label: 'all topics' }}
+    lede={`${n} ${n === 1 ? 'post' : 'posts'} tagged ${topic.name}, newest first.`}
+  />
+  <div class="posts">
+    <Timeline posts={topic.posts} />
+  </div>
+  <Sidebar slot="sidebar" />
+</BaseLayout>
+
+<style>
+  .posts {
+    margin-block-start: var(--space-l);
+  }
+
+  @media (width >= 48rem) {
+    .posts {
+      margin-block-start: var(--space-xl);
+    }
+  }
+</style>

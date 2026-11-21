@@ -1,0 +1,134 @@
+---
+/**
+ * The page header.
+ * - `home`: the Zune-style giant “lone voice” running off the edge.
+ * - `page`: a compact name for every other page.
+ * Both show the Zune shapes and the pivot menu. The round search button
+ * appears where no sidebar search box is visible.
+ */
+import { SITE } from '@/site.config';
+import PivotNav from './PivotNav.astro';
+import RoundButton from './RoundButton.astro';
+import ZuneArt from './ZuneArt.astro';
+
+interface Props {
+  variant?: 'home' | 'page';
+  /** `mobile`: hide the button where the sidebar (with its search box) shows. */
+  search?: 'always' | 'mobile';
+}
+
+const { variant = 'page', search = 'always' } = Astro.props;
+const onSearchPage = Astro.url.pathname.startsWith('/search');
+const NameTag = variant === 'home' ? 'h1' : 'p';
+---
+
+<header class:list={['header', variant]}>
+  <ZuneArt size={variant === 'home' ? 'large' : 'small'} />
+  <div class="container inner">
+    <div class="top">
+      <NameTag class="name"><a href="/">{SITE.title.toLowerCase()}</a></NameTag>
+      <div class:list={['search', { 'mobile-only': search === 'mobile' }]}>
+        <RoundButton href="/search/" icon="search" label="Search" current={onSearchPage} />
+      </div>
+    </div>
+    {variant === 'home' && <p class="tagline">{SITE.tagline}</p>}
+    <PivotNav />
+  </div>
+</header>
+
+<style>
+  .header {
+    position: relative;
+    border-bottom: var(--border-thin);
+  }
+
+  .inner {
+    position: relative;
+    padding-block-start: var(--space-m);
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+  }
+
+  .name {
+    font-weight: var(--weight-light);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .name a:hover {
+    text-decoration: none;
+  }
+
+  .page .name {
+    font-size: var(--text-brand);
+    letter-spacing: -0.04em;
+  }
+
+  .tagline {
+    margin-block-start: var(--space-2xs);
+    font-size: var(--text-l);
+    font-weight: var(--weight-light);
+    color: var(--color-muted);
+  }
+
+  /* Homepage: the name is too big for one row with the search button, so the
+     button sits above it and the name runs off the right edge. */
+  .home .top {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .home .search {
+    align-self: flex-end;
+  }
+
+  .home .name {
+    margin-inline-start: -0.06em;
+    margin-block-start: calc(-1 * var(--space-2xs));
+    font-size: var(--text-display);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .header :global(nav) {
+    margin-block-start: var(--space-s);
+  }
+
+  .home :global(nav) {
+    margin-block-start: var(--space-m);
+  }
+
+  @media (width >= 48rem) {
+    .inner {
+      padding-block-start: var(--space-xl);
+    }
+
+    .tagline {
+      font-size: 1.25rem;
+    }
+
+    .header :global(nav) {
+      margin-block-start: var(--space-l);
+    }
+
+    .home :global(nav) {
+      margin-block-start: var(--space-xl);
+    }
+  }
+
+  @media (width >= 64rem) {
+    .mobile-only {
+      display: none;
+    }
+
+    .home .search:not(.mobile-only) {
+      position: absolute;
+      top: var(--space-xl);
+      right: var(--space-gutter);
+    }
+  }
+</style>

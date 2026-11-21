@@ -1,0 +1,83 @@
+---
+import { LEGAL_LINKS, SITE } from '@/site.config';
+
+const path = Astro.url.pathname;
+---
+
+<footer class="footer">
+  <div class="container">
+    <p class="ghost" aria-hidden="true">{SITE.title.toLowerCase()}</p>
+    <div class="row">
+      <p>© {SITE.copyrightYear} {SITE.title}. All rights reserved.</p>
+      <nav aria-label="Legal">
+        <ul>
+          {
+            LEGAL_LINKS.map((link) => (
+              <li>
+                <a href={link.href} aria-current={path.startsWith(link.href) ? 'page' : undefined}>
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-block-start: var(--space-2xl);
+    padding-block: var(--space-m) var(--space-l);
+    border-top: var(--border-thin);
+    overflow: hidden;
+  }
+
+  /* The oversized, barely-visible name: a Zune-style closing flourish. */
+  .ghost {
+    margin-inline-start: -0.05em;
+    font-size: 3.5rem;
+    font-weight: var(--weight-light);
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    white-space: nowrap;
+    color: var(--color-ghost);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2xs) var(--space-m);
+    margin-block-start: var(--space-s);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+
+  ul {
+    display: flex;
+    gap: var(--space-m);
+    padding: 0;
+    list-style: none;
+  }
+
+  a[aria-current='page'] {
+    color: var(--color-fg);
+  }
+
+  @media (width >= 48rem) {
+    .footer {
+      padding-block: var(--space-l) var(--space-xl);
+    }
+
+    .ghost {
+      font-size: 6rem;
+    }
+
+    .row {
+      margin-block-start: var(--space-m);
+      font-size: var(--text-s);
+    }
+  }
+</style>

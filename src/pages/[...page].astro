@@ -1,0 +1,28 @@
+---
+/** Homepage: every post, newest first, ten to a page. */
+import type { GetStaticPaths, Page } from 'astro';
+import Pagination from '@/components/Pagination.astro';
+import Sidebar from '@/components/Sidebar.astro';
+import Timeline from '@/components/Timeline.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getPosts, type Post } from '@/lib/posts';
+import { SITE } from '@/site.config';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  return paginate(await getPosts(), { pageSize: SITE.pageSize });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<Post>;
+}
+
+const { page } = Astro.props;
+const title = page.currentPage > 1 ? `Page ${page.currentPage} of ${page.lastPage}` : undefined;
+---
+
+<BaseLayout title={title} header="home">
+  <h2 class="visually-hidden">Latest posts</h2>
+  <Timeline posts={page.data} />
+  <Pagination page={page} />
+  <Sidebar slot="sidebar" showIntro={page.currentPage === 1} />
+</BaseLayout>

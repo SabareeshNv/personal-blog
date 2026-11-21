@@ -1,0 +1,58 @@
+---
+import RoundButton from '@/components/RoundButton.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found">
+  <p class="big" aria-hidden="true">404</p>
+  <h1 class="title">page not found</h1>
+  <p class="text">This page has moved or never existed. Try the latest posts, or search for what you were looking for.</p>
+  <div class="actions">
+    <RoundButton href="/" icon="arrow-left" text="back to posts" />
+    <RoundButton href="/search/" icon="search" text="search" />
+  </div>
+</BaseLayout>
+
+<style>
+  .big {
+    margin-inline-start: -0.04em;
+    font-size: 9.5rem;
+    font-weight: var(--weight-light);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: var(--color-accent);
+  }
+
+  .title {
+    margin-block-start: var(--space-m);
+    font-size: 2.75rem;
+    font-weight: var(--weight-light);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .text {
+    margin-block-start: var(--space-s);
+    color: var(--color-body);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s) var(--space-xl);
+    margin-block-start: var(--space-l);
+  }
+
+  @media (width >= 48rem) {
+    .big {
+      font-size: 15rem;
+    }
+
+    .title {
+      font-size: var(--text-page-title);
+    }
+
+    .actions {
+      margin-block-start: var(--space-xl);
+    }
+  }
+</style>

@@ -1,0 +1,111 @@
+---
+/**
+ * The date of a post.
+ * - Phones: one small line, “21 NOV 2026 · SAT”, so the title gets the width.
+ * - Tablets and up: the Zune date block, a stack of NOV / 21 / SAT / 2026.
+ * The weekday alternates orange and pink down the timeline.
+ */
+import { dateParts, fullDate } from '@/lib/format';
+
+interface Props {
+  date: Date;
+  href?: string;
+  /** Position in the list, used to alternate the weekday colour. */
+  index?: number;
+}
+
+const { date, href, index = 0 } = Astro.props;
+const { day, month, weekday, year } = dateParts(date);
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag class:list={['date', index % 2 ? 'pink' : 'orange']} href={href}>
+  <time datetime={date.toISOString()}>
+    <span class="visually-hidden">{fullDate(date)}</span>
+    <span class="parts" aria-hidden="true">
+      <span class="month">{month}</span>
+      <span class="day">{day}</span>
+      <span class="year">{year}</span>
+      <span class="weekday">{weekday}</span>
+    </span>
+  </time>
+</Tag>
+
+<style>
+  .date {
+    display: block;
+    color: var(--color-fg);
+  }
+
+  .date:hover {
+    text-decoration: none;
+  }
+
+  /* Phones: a single small line in the order 21 NOV 2026 · SAT. */
+  .parts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3xs) 0.375rem;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-caps);
+  }
+
+  .day {
+    order: -1;
+  }
+
+  .month,
+  .year {
+    color: var(--color-muted);
+  }
+
+  .weekday::before {
+    content: '· ';
+  }
+
+  .orange .weekday {
+    color: var(--color-orange);
+  }
+
+  .pink .weekday {
+    color: var(--color-pink);
+  }
+
+  /* Tablets and up: the vertical Zune date block. */
+  @media (width >= 48rem) {
+    .parts {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+      font-size: var(--text-xs);
+    }
+
+    .day {
+      order: 0;
+      margin: var(--space-3xs) 0 var(--space-3xs) -0.05em;
+      font-size: 3.75rem;
+      font-weight: var(--weight-light);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .weekday {
+      order: 1;
+      font-size: var(--text-s);
+    }
+
+    .weekday::before {
+      content: none;
+    }
+
+    .year {
+      order: 2;
+      margin-block-start: var(--space-2xs);
+      font-size: var(--text-2xs);
+      font-weight: var(--weight-regular);
+      letter-spacing: normal;
+    }
+  }
+</style>

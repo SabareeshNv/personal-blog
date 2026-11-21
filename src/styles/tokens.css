@@ -1,0 +1,97 @@
+/*
+ * Design tokens: every colour, size and space used on the site.
+ * Components use these custom properties; they never hard-code values.
+ *
+ * Mobile first: the base values suit phones. Larger screens override a few
+ * of them at the two breakpoints used everywhere on the site:
+ *   48rem (768px)  — tablet: vertical date blocks, larger type
+ *   64rem (1024px) — desktop: two columns with the sidebar
+ */
+:root {
+  /*
+   * The site is dark, like the Zune HD. Every colour also has a light value:
+   * change this to `dark light` to follow the reader's system setting.
+   */
+  color-scheme: dark;
+
+  /* Colour: light-dark(light value, dark value). */
+  --color-bg: light-dark(#fff, #000);
+  --color-fg: light-dark(#000, #fff);
+  --color-body: light-dark(#3d3d3d, #c4c4c4);
+  --color-muted: light-dark(#666, #8c8c8c);
+  --color-line: light-dark(#e0e0e0, #2e2e2e);
+  --color-tile: light-dark(#ededed, #1a1a1a);
+  --color-ghost: light-dark(#ededed, #1f1f1f);
+  --color-accent: #d6006f; /* Zune magenta: tiles, buttons */
+  --color-on-accent: #fff;
+  --color-accent-text: light-dark(#d6006f, #ff5cae); /* links, tags */
+  --color-orange: light-dark(#b84200, #ff8a1f);
+  --color-pink: light-dark(#b0005a, #ff4fa3);
+  --gradient-zune: linear-gradient(125deg, #8f004a 0%, #d6006f 50%, #f25c05 100%);
+
+  /* Type */
+  --font-sans: 'Open Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-bold: 600;
+
+  --text-2xs: 0.75rem; /* 12 — date line, small capitals */
+  --text-xs: 0.8125rem; /* 13 — meta */
+  --text-s: 0.9375rem; /* 15 — tags, small print */
+  --text-m: 1rem; /* 16 — summaries on phones */
+  --text-l: 1.0625rem; /* 17 — body */
+  --text-xl: 1.1875rem; /* 19 — notes */
+  --text-2xl: 1.5rem; /* 24 — section headings on phones */
+  --text-3xl: 1.875rem; /* 30 — section headings */
+
+  --text-post-title: 1.3125rem; /* 21 */
+  --text-article-title: 1.75rem; /* 28 */
+  --text-brand: 2.5rem; /* 40 — compact header name */
+  --text-pivot: 1.75rem; /* 28 — menu */
+  --text-page-title: 3.5rem; /* 56 */
+  --text-display: 5.25rem; /* 84 — homepage name */
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.6;
+  --leading-loose: 1.75;
+  --tracking-caps: 0.1em; /* small capitals */
+  --tracking-display: -0.045em; /* large thin type */
+
+  /* Space: one scale for every gap, margin and padding. */
+  --space-3xs: 0.25rem; /* 4 */
+  --space-2xs: 0.5rem; /* 8 */
+  --space-xs: 0.75rem; /* 12 */
+  --space-s: 1rem; /* 16 */
+  --space-m: 1.5rem; /* 24 */
+  --space-l: 2rem; /* 32 */
+  --space-xl: 3rem; /* 48 */
+  --space-2xl: 5rem; /* 80 */
+
+  --space-gutter: var(--space-s); /* page side padding */
+  --space-header: var(--space-xl); /* gap below the header */
+  --space-post: var(--space-m); /* padding above and below each post */
+
+  /* Layout */
+  --width-page: 75rem; /* 1200 */
+  --width-main: 47.5rem; /* 760 */
+  --width-side: 20rem; /* 320 */
+  --gap-columns: 4rem; /* 64 */
+  --size-touch: 2.75rem; /* 44 — smallest tap target */
+  --size-thumb: 5.25rem; /* 84 — cover thumbnail on phones */
+  --border-thin: 1px solid var(--color-line);
+}
+
+@media (width >= 48rem) {
+  :root {
+    --text-post-title: 2rem; /* 32 */
+    --text-article-title: 2.75rem; /* 44 */
+    --text-brand: 4rem; /* 64 */
+    --text-pivot: 2.5rem; /* 40 */
+    --text-page-title: 6rem; /* 96 */
+    --text-display: 11rem; /* 176 */
+    --space-header: 5.5rem; /* 88 */
+    --space-post: 2.5rem; /* 40 */
+    --size-thumb: 15rem; /* 240 */
+  }
+}

@@ -1,0 +1,31 @@
+---
+import type { Page } from 'astro';
+import type { Post } from '@/lib/posts';
+import RoundButton from './RoundButton.astro';
+
+interface Props {
+  page: Page<Post>;
+}
+
+const { page } = Astro.props;
+const { prev, next } = page.url;
+---
+
+{
+  (prev || next) && (
+    <nav class="pagination" aria-label="More posts">
+      {prev && <RoundButton href={prev} icon="arrow-left" text="newer posts" />}
+      {next && <RoundButton href={next} icon="arrow-down" text="older posts" />}
+    </nav>
+  )
+}
+
+<style>
+  .pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-s) var(--space-xl);
+    padding-block-start: var(--space-xl);
+  }
+</style>

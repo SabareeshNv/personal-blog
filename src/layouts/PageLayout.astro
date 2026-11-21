@@ -1,0 +1,54 @@
+---
+/**
+ * A single-column text page: About, the policies. Big title, optional
+ * “last updated” line, then the text with prose typography.
+ */
+import PageIntro from '@/components/PageIntro.astro';
+import Prose from '@/components/Prose.astro';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Hide the big title (when the pivot menu already names the page). */
+  hideTitle?: boolean;
+  updated?: string;
+}
+
+const { title, description, hideTitle = false, updated } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <PageIntro title={title} hidden={hideTitle}>
+    {updated && <p class="updated">Last updated {updated}</p>}
+  </PageIntro>
+  <div class:list={['content', { flush: hideTitle }]}>
+    <slot name="lead" />
+    <Prose><slot /></Prose>
+  </div>
+</BaseLayout>
+
+<style>
+  .updated {
+    margin-block-start: var(--space-s);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .content {
+    margin-block-start: var(--space-l);
+  }
+
+  .content.flush {
+    margin-block-start: 0;
+  }
+
+  @media (width >= 48rem) {
+    .content {
+      margin-block-start: var(--space-xl);
+    }
+  }
+</style>
