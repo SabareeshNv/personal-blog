@@ -78,6 +78,18 @@
     return box.height > 0 && box.bottom > 0 && box.top < innerHeight;
   }
 
+  /**
+   * Exit animations still holding elements hidden. If the browser leaves the
+   * page anyway (a file link, a failed load) and later restores it from its
+   * back/forward cache, these are cancelled so the content shows again.
+   */
+  let leftovers: Animation[] = [];
+
+  const track = (animation: Animation) => {
+    leftovers.push(animation);
+    return animation.finished;
+  };
+
   /** Swing elements away on their left-edge hinge, top first. */
   function swingAway(elements: HTMLElement[], back: boolean, startIndex = 0) {
     const angle = back ? EXIT.angle : -EXIT.angle;
@@ -86,7 +98,7 @@
       .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
       .map((el, i) => {
         el.style.transformOrigin = '0 50%';
-        return el.animate(
+        return track(el.animate(
           [
             { transform: 'perspective(800px) rotateY(0deg)', opacity: 1 },
             { transform: `perspective(800px) rotateY(${angle}deg)`, opacity: 0 },
@@ -97,23 +109,47 @@
             easing: EXIT.easing,
             fill: 'forwards',
           },
-        ).finished;
+        ));
       });
   }
 
   const lift = (elements: HTMLElement[]) =>
     elements.map(
       (el) =>
-        el.animate([{ transform: 'none' }, { transform: LIFT.transform }], {
-          duration: LIFT.duration,
-          easing: LIFT.easing,
-          fill: 'forwards',
-        }).finished,
+        track(
+          el.animate([{ transform: 'none' }, { transform: LIFT.transform }], {
+            duration: LIFT.duration,
+            easing: LIFT.easing,
+            fill: 'forwards',
+          }),
+        ),
     );
+
+  /** Undo everything a page change did to this page (names, swings, lifts). */
+  function restorePage() {
+    leftovers.forEach((animation) => animation.cancel());
+    leftovers = [];
+    clearCardNames(document);
+    document.querySelectorAll<HTMLElement>('[data-flight]').forEach((el) => (el.style.viewTransitionName = ''));
+    document.querySelectorAll('.flying').forEach((el) => el.classList.remove('flying'));
+  }
+
+  /** A link to a file (the RSS feed, an image), not a page: the browser loads it normally. */
+  const isFile = (url: URL) => /\.[a-z0-9]+$/i.test(url.pathname);
 
   /* ---------- Wiring ---------- */
 
+  // Back to a page the browser kept in its back/forward cache: show it as it was.
+  addEventListener('pageshow', (event) => {
+    if (event.persisted) restorePage();
+  });
+
+  document.addEventListener('astro:after-swap', () => (leftovers = []));
+
   document.addEventListener('astro:before-preparation', (event) => {
+    // Files aren't pages: no page change, so nothing may swing away.
+    if (isFile(event.to)) return;
+
     const motion = motionFor(event.from, event.to);
     document.documentElement.dataset.motion = motion;
 

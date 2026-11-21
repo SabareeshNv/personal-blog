@@ -15,6 +15,10 @@ interface Props {
 }
 
 const { href, icon, text, label, current = false } = Astro.props;
+
+// A file (e.g. /rss.xml) isn't a page: let the browser load it normally,
+// without the page-change animations.
+const isFile = /\.[a-z0-9]+$/i.test(href.split(/[?#]/)[0] ?? '');
 ---
 
 <a
@@ -22,6 +26,7 @@ const { href, icon, text, label, current = false } = Astro.props;
   class:list={['round', { current }]}
   aria-label={text ? undefined : label}
   aria-current={current ? 'page' : undefined}
+  data-astro-reload={isFile ? true : undefined}
 >
   <span class="circle"><Icon name={icon} size={18} /></span>
   {text && <span class="text">{text}</span>}

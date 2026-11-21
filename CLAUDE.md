@@ -121,6 +121,7 @@ Built on Astro's `<ClientRouter />` (in `BaseHead.astro`), so pages swap without
 6. **Shared elements whose size changes:** text (`view-transition-class: text`) and covers (`cover`) hide the old copy and scale the new one, instead of cross-fading two sizes.
 7. **`::view-transition-group(main|sidebar)` has `animation: none`.** Morphing column boxes stretches the text.
 8. **Page scripts run once under the client router.** Put setup in an `astro:page-load` listener (see `search.astro`).
+9. **Links to files must never trigger the turnstile exit.** The owner tapped RSS on About, pressed Back, and saw an empty page: the exit had hidden the content, the browser then loaded `rss.xml` normally, and Safari's back/forward cache restored the page still hidden. Now: `RoundButton` adds `data-astro-reload` to links whose path has a file extension (so the client router ignores them), `MotionDirector` skips any navigation to a file path, and a `pageshow` (persisted) handler cancels leftover exit animations and names. Any new link to a file (feeds, images, downloads) must not go through the client router.
 
 ## SEO (`BaseHead.astro`, `src/lib/seo.ts`)
 
