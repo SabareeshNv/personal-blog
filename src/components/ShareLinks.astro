@@ -1,0 +1,40 @@
+---
+/**
+ * Round buttons that share the current page on Facebook, X, Telegram and
+ * WhatsApp. Plain links to each service's share page: no scripts, no
+ * trackers. The services build the preview from the page's Open Graph tags.
+ */
+import { SITE } from '@/site.config';
+import RoundButton from './RoundButton.astro';
+import type { IconName } from './Icon.astro';
+
+const url = encodeURIComponent(new URL(Astro.url.pathname, SITE.url).href);
+
+const services: { name: string; icon: IconName; href: string }[] = [
+  { name: 'Facebook', icon: 'facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${url}` },
+  { name: 'X', icon: 'x', href: `https://x.com/intent/tweet?url=${url}` },
+  { name: 'Telegram', icon: 'telegram', href: `https://t.me/share/url?url=${url}` },
+  { name: 'WhatsApp', icon: 'whatsapp', href: `https://wa.me/?text=${url}` },
+];
+---
+
+<ul class="share" aria-label="Share this page">
+  {
+    services.map((s) => (
+      <li>
+        <RoundButton href={s.href} icon={s.icon} label={`Share on ${s.name}`} external />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .share {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

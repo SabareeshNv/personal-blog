@@ -12,13 +12,15 @@ interface Props {
   text?: string;
   label?: string;
   current?: boolean;
+  /** Another site: opens in a new tab, outside the page-change animations. */
+  external?: boolean;
 }
 
-const { href, icon, text, label, current = false } = Astro.props;
+const { href, icon, text, label, current = false, external = false } = Astro.props;
 
 // A file (e.g. /rss.xml) isn't a page: let the browser load it normally,
 // without the page-change animations.
-const isFile = /\.[a-z0-9]+$/i.test(href.split(/[?#]/)[0] ?? '');
+const isFile = !external && /\.[a-z0-9]+$/i.test(href.split(/[?#]/)[0] ?? '');
 ---
 
 <a
@@ -27,6 +29,8 @@ const isFile = /\.[a-z0-9]+$/i.test(href.split(/[?#]/)[0] ?? '');
   aria-label={text ? undefined : label}
   aria-current={current ? 'page' : undefined}
   data-astro-reload={isFile ? true : undefined}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
 >
   <span class="circle"><Icon name={icon} size={18} /></span>
   {text && <span class="text">{text}</span>}
