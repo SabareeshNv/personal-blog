@@ -9,6 +9,7 @@ import Sidebar from '@/components/Sidebar.astro';
 import TagList from '@/components/TagList.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { shortDate } from '@/lib/format';
+import { shared } from '@/lib/motion';
 import { displayTitle, excerpt, getPosts, postUrl, type Post } from '@/lib/posts';
 
 export const getStaticPaths = (async () => {
@@ -38,15 +39,23 @@ const heading = displayTitle(post);
   type="article"
 >
   <article class="article" data-pagefind-body data-pagefind-meta={`date:${shortDate(date)}`}>
-    <div data-pagefind-ignore><PostDate date={date} /></div>
+    <div data-pagefind-ignore><PostDate date={date} name={shared.date(post.id)} /></div>
     <div class="body">
       <header class="head">
-        <h1 class:list={['title', { 'visually-hidden': !title }]} data-pagefind-meta="title">{heading}</h1>
+        <h1
+          class:list={['title', { 'visually-hidden': !title }]}
+          data-pagefind-meta="title"
+          transition:name={title ? shared.title(post.id) : undefined}
+        >
+          {heading}
+        </h1>
         <div data-pagefind-ignore><TagList tags={tags} /></div>
       </header>
       {
         cover && (
-          <Image class="cover" src={cover} alt={coverAlt ?? ''} width={1200} loading="eager" />
+          <div class="cover" transition:name={shared.cover(post.id)}>
+            <Image src={cover} alt={coverAlt ?? ''} width={1200} loading="eager" />
+          </div>
         )
       }
       <Prose><Content /></Prose>
@@ -89,16 +98,22 @@ const heading = displayTitle(post);
   }
 
   .title {
+    view-transition-class: text;
     font-size: var(--text-article-title);
     font-weight: var(--weight-bold);
     letter-spacing: -0.02em;
   }
 
   .cover {
+    overflow: hidden;
+    background: var(--color-tile);
+    view-transition-class: cover;
+  }
+
+  .cover :global(img) {
     width: 100%;
     aspect-ratio: 16 / 10;
     object-fit: cover;
-    background: var(--color-tile);
   }
 
   .pager {

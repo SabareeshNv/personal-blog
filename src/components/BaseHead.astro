@@ -3,6 +3,7 @@ import '@fontsource/open-sans/300.css';
 import '@fontsource/open-sans/400.css';
 import '@fontsource/open-sans/600.css';
 import '@/styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import { SITE } from '@/site.config';
 
 interface Props {
@@ -36,3 +37,6 @@ const imageUrl = image ? new URL(image, Astro.site) : undefined;
 <meta property="og:url" content={canonical} />
 {imageUrl && <meta property="og:image" content={imageUrl} />}
 <meta name="twitter:card" content={imageUrl ? 'summary_large_image' : 'summary'} />
+
+<!-- Page transitions: see src/lib/motion.ts and src/styles/motion.css. -->
+<ClientRouter />

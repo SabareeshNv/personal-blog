@@ -117,6 +117,19 @@ Each component keeps its markup, its styles (scoped with `<style>`) and its scri
 - **Logical properties** (`margin-block-start`, `padding-inline`) and **flexbox/grid with `gap`** for layout.
 - **Accessible by default:** real links and buttons, visible focus outlines, a skip link, labelled icons, and `prefers-reduced-motion` respected.
 
+## Motion
+
+Page changes use Astro's view transitions (`<ClientRouter />` in `BaseHead.astro`), styled after Windows Phone:
+
+- **Turnstile:** the main column swings away on a hinge at its left edge and the new page swings in; the sidebar follows a moment later. Going back plays it in reverse.
+- **Continuum:** a post's date, title and cover fly from the timeline to their place on the post page, and back.
+- **Header:** the site name shrinks from the giant homepage size to the compact one; the menu and the pink-to-orange shapes glide into place.
+- **Feather:** timeline posts, topic tiles and search results arrive one after another.
+
+The animations are defined in `src/lib/motion.ts` (which element animates how) and `src/styles/motion.css` (keyframes and timing). All motion is turned off for readers who set “reduce motion” in their system. Browsers without the View Transitions API simply load pages normally.
+
+Scripts in pages run only once with the client router, so page setup belongs in an `astro:page-load` listener (see `src/pages/search.astro`).
+
 ## Deploying
 
 The site is fully static. On Cloudflare Pages, set the build command to `npm run build` and the output directory to `dist`.

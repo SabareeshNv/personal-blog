@@ -8,6 +8,7 @@
 import BaseHead from '@/components/BaseHead.astro';
 import SiteFooter from '@/components/SiteFooter.astro';
 import SiteHeader from '@/components/SiteHeader.astro';
+import { pageTurn, sideTurn } from '@/lib/motion';
 import { SITE } from '@/site.config';
 
 interface Props {
@@ -31,12 +32,12 @@ const hasSidebar = Astro.slots.has('sidebar');
     <a class="skip-link" href="#content">Skip to content</a>
     <SiteHeader variant={header} search={hasSidebar ? 'mobile' : 'always'} />
     <div class:list={['container', 'layout', { 'with-sidebar': hasSidebar }]}>
-      <main id="content" class="main">
+      <main id="content" class="main" transition:name="main" transition:animate={pageTurn}>
         <slot />
       </main>
       {
         hasSidebar && (
-          <aside class="sidebar" aria-label={`More from ${SITE.title}`}>
+          <aside class="sidebar" aria-label={`More from ${SITE.title}`} transition:name="sidebar" transition:animate={sideTurn}>
             <slot name="sidebar" />
           </aside>
         )

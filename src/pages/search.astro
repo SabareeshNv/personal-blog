@@ -20,7 +20,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
   <ol class="results" data-results></ol>
 
   <template data-result-template>
-    <li class="result">
+    <li class="result feather">
       <a class="link">
         <span class="date" data-date></span>
         <span class="title" data-title></span>
@@ -31,77 +31,88 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
-  interface PagefindResult {
-    data: () => Promise<{ url: string; excerpt: string; meta: { title?: string; date?: string } }>;
+  interface PagefindData {
+    url: string;
+    excerpt: string;
+    meta: { title?: string; date?: string };
   }
   interface Pagefind {
-    search: (query: string) => Promise<{ results: PagefindResult[] }>;
+    search: (query: string) => Promise<{ results: { data: () => Promise<PagefindData> }[] }>;
   }
 
   const MAX_RESULTS = 20;
-
-  const input = document.querySelector<HTMLInputElement>('#search-page-field')!;
-  const form = input.form!;
-  const status = document.querySelector<HTMLElement>('[data-status]')!;
-  const list = document.querySelector<HTMLOListElement>('[data-results]')!;
-  const template = document.querySelector<HTMLTemplateElement>('[data-result-template]')!;
-
   let pagefind: Pagefind | undefined;
 
   async function loadPagefind(): Promise<Pagefind | undefined> {
-    if (pagefind) return pagefind;
     try {
       // The index is generated at build time, so Vite must not bundle it.
-      pagefind = (await import(/* @vite-ignore */ `${location.origin}/pagefind/pagefind.js`)) as Pagefind;
+      pagefind ??= (await import(/* @vite-ignore */ `${location.origin}/pagefind/pagefind.js`)) as Pagefind;
       return pagefind;
     } catch {
-      status.textContent = 'Search is not available here. It works on the built site.';
       return undefined;
     }
   }
 
-  function renderResult(data: Awaited<ReturnType<PagefindResult['data']>>) {
-    const item = template.content.cloneNode(true) as DocumentFragment;
-    item.querySelector<HTMLAnchorElement>('a')!.href = data.url;
-    item.querySelector('[data-date]')!.textContent = data.meta.date ?? '';
-    item.querySelector('[data-title]')!.textContent = data.meta.title ?? data.url;
-    // Pagefind returns the excerpt as HTML with <mark> around the matches.
-    item.querySelector('[data-excerpt]')!.innerHTML = data.excerpt;
-    return item;
-  }
+  /**
+   * Runs on every visit to the search page. With Astro's client router a
+   * page script only loads once, so the setup listens for `astro:page-load`.
+   */
+  function setUpSearch() {
+    const input = document.querySelector<HTMLInputElement>('#search-page-field');
+    if (!input?.form) return; // not on the search page
 
-  async function runSearch(query: string) {
-    list.replaceChildren();
-    if (!query) {
-      status.textContent = '';
-      return;
+    const form = input.form;
+    const status = document.querySelector<HTMLElement>('[data-status]')!;
+    const list = document.querySelector<HTMLOListElement>('[data-results]')!;
+    const template = document.querySelector<HTMLTemplateElement>('[data-result-template]')!;
+
+    function renderResult(data: PagefindData, index: number) {
+      const item = template.content.cloneNode(true) as DocumentFragment;
+      item.querySelector<HTMLElement>('li')!.style.setProperty('--i', String(index));
+      item.querySelector<HTMLAnchorElement>('a')!.href = data.url;
+      item.querySelector('[data-date]')!.textContent = data.meta.date ?? '';
+      item.querySelector('[data-title]')!.textContent = data.meta.title ?? data.url;
+      // Pagefind returns the excerpt as HTML with <mark> around the matches.
+      item.querySelector('[data-excerpt]')!.innerHTML = data.excerpt;
+      return item;
     }
-    const engine = await loadPagefind();
-    if (!engine) return;
 
-    status.textContent = 'Searching…';
-    const { results } = await engine.search(query);
-    const data = await Promise.all(results.slice(0, MAX_RESULTS).map((result) => result.data()));
-    list.replaceChildren(...data.map(renderResult));
+    async function runSearch(query: string) {
+      list.replaceChildren();
+      if (!query) {
+        status.textContent = '';
+        return;
+      }
+      const engine = await loadPagefind();
+      if (!engine) {
+        status.textContent = 'Search is not available here. It works on the built site.';
+        return;
+      }
+      status.textContent = 'Searching…';
+      const { results } = await engine.search(query);
+      const data = await Promise.all(results.slice(0, MAX_RESULTS).map((result) => result.data()));
+      list.replaceChildren(...data.map(renderResult));
+      const count = results.length;
+      status.textContent = `${count} ${count === 1 ? 'result' : 'results'} for “${query}”`;
+    }
 
-    const count = results.length;
-    status.textContent = `${count} ${count === 1 ? 'result' : 'results'} for “${query}”`;
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const query = input.value.trim();
+      const url = new URL(location.href);
+      if (query) url.searchParams.set('q', query);
+      else url.searchParams.delete('q');
+      history.replaceState(history.state, '', url);
+      runSearch(query);
+    });
+
+    const initial = new URLSearchParams(location.search).get('q')?.trim() ?? '';
+    input.value = initial;
+    if (initial) runSearch(initial);
+    else input.focus();
   }
 
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const query = input.value.trim();
-    const url = new URL(location.href);
-    if (query) url.searchParams.set('q', query);
-    else url.searchParams.delete('q');
-    history.replaceState(null, '', url);
-    runSearch(query);
-  });
-
-  const initial = new URLSearchParams(location.search).get('q')?.trim() ?? '';
-  input.value = initial;
-  if (initial) runSearch(initial);
-  else input.focus();
+  document.addEventListener('astro:page-load', setUpSearch);
 </script>
 
 <style>

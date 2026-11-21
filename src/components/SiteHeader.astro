@@ -26,13 +26,13 @@ const NameTag = variant === 'home' ? 'h1' : 'p';
   <ZuneArt size={variant === 'home' ? 'large' : 'small'} />
   <div class="container inner">
     <div class="top">
-      <NameTag class="name"><a href="/">{SITE.title.toLowerCase()}</a></NameTag>
-      <div class:list={['search', { 'mobile-only': search === 'mobile' }]}>
+      <NameTag class="name" transition:name="site-name"><a href="/">{SITE.title.toLowerCase()}</a></NameTag>
+      <div class:list={['search', { 'mobile-only': search === 'mobile' }]} transition:name="search-button">
         <RoundButton href="/search/" icon="search" label="Search" current={onSearchPage} />
       </div>
     </div>
     {variant === 'home' && <p class="tagline">{SITE.tagline}</p>}
-    <PivotNav />
+    <div transition:name="pivot"><PivotNav /></div>
   </div>
 </header>
 
@@ -55,6 +55,7 @@ const NameTag = variant === 'home' ? 'h1' : 'p';
   }
 
   .name {
+    view-transition-class: text;
     font-weight: var(--weight-light);
     line-height: 1;
     white-space: nowrap;

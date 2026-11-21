@@ -7,6 +7,7 @@
  */
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
+import { shared } from '@/lib/motion';
 import { isPhoto, postUrl, summary, type Post } from '@/lib/posts';
 import Icon from './Icon.astro';
 import PostDate from './PostDate.astro';
@@ -24,14 +25,14 @@ const photo = isPhoto(post);
 const { Content } = !title ? await render(post) : { Content: null };
 ---
 
-<article class="post">
-  <PostDate date={date} href={url} index={index} />
+<article class="post feather" style={`--i: ${index}`}>
+  <PostDate date={date} href={url} index={index} name={shared.date(post.id)} />
   <div class="body">
     {
       title ? (
         <div class:list={['titled', { 'has-thumb': cover }]}>
           <div class="text">
-            <h2 class="title">
+            <h2 class="title" transition:name={shared.title(post.id)}>
               <a href={url}>{title}</a>
             </h2>
             <p class="summary">{summary(post)}</p>
@@ -40,14 +41,14 @@ const { Content } = !title ? await render(post) : { Content: null };
             </a>
           </div>
           {cover && (
-            <a class="thumb" href={url} tabindex="-1" aria-hidden="true">
+            <a class="thumb" href={url} tabindex="-1" aria-hidden="true" transition:name={shared.cover(post.id)}>
               <Image src={cover} alt="" width={480} />
             </a>
           )}
         </div>
       ) : photo && cover ? (
         <>
-          <a class="photo" href={url}>
+          <a class="photo" href={url} transition:name={shared.cover(post.id)}>
             <Image src={cover} alt={coverAlt ?? ''} width={1200} />
           </a>
           <div class="caption">{Content && <Content />}</div>
@@ -87,6 +88,7 @@ const { Content } = !title ? await render(post) : { Content: null };
   }
 
   .title {
+    view-transition-class: text;
     font-size: var(--text-post-title);
     font-weight: var(--weight-bold);
     letter-spacing: -0.015em;
@@ -111,6 +113,7 @@ const { Content } = !title ? await render(post) : { Content: null };
   .thumb,
   .photo {
     display: block;
+    view-transition-class: cover;
     overflow: hidden;
     background: var(--color-tile);
   }

@@ -17,7 +17,10 @@ const count = (n: number) => `${n} ${n === 1 ? 'post' : 'posts'}`;
   <ul class="tiles">
     {
       topics.map((topic, i) => (
-        <li class:list={['tile', { wide: i === 0 || i === 6, featured: i === 0, accent: i === 1 }]}>
+        <li
+          class:list={['tile', 'feather', { wide: i === 0 || i === 6, featured: i === 0, accent: i === 1 }]}
+          style={`--i: ${i}`}
+        >
           <a href={tagUrl(topic.name)}>
             <span class="count">{count(topic.posts.length)}</span>
             <span class="name">#{topic.name}</span>

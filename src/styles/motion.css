@@ -1,0 +1,96 @@
+/*
+ * Motion: Zune / Windows Phone page transitions.
+ *
+ * Astro's <ClientRouter /> runs the View Transitions API on every navigation.
+ * src/lib/motion.ts says which element uses which animation; the keyframes
+ * are here because view-transition pseudo-elements need global CSS.
+ */
+
+:root {
+  --ease-out-quint: cubic-bezier(0.1, 0.9, 0.2, 1);
+  --duration-morph: 0.45s;
+  --duration-feather: 0.5s;
+  --stagger-feather: 45ms;
+}
+
+/* Turnstile: pages swing on a hinge at their left edge. */
+@keyframes lv-turnstile-out {
+  to {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-70deg);
+  }
+}
+
+@keyframes lv-turnstile-in {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(70deg);
+  }
+}
+
+@keyframes lv-turnstile-out-back {
+  to {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(70deg);
+  }
+}
+
+@keyframes lv-turnstile-in-back {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-70deg);
+  }
+}
+
+::view-transition-old(main),
+::view-transition-new(main),
+::view-transition-old(sidebar),
+::view-transition-new(sidebar) {
+  transform-origin: 0 50%;
+}
+
+/* Shared elements (name, menu, titles, covers) fly with a long, soft ease-out. */
+::view-transition-group(*) {
+  animation-duration: var(--duration-morph);
+  animation-timing-function: var(--ease-out-quint);
+}
+
+/* A cover changes shape between thumbnail and full width: crop, don't stretch. */
+::view-transition-old(*.cover),
+::view-transition-new(*.cover) {
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+ * Shared text (the site name, post titles) changes size between pages.
+ * Cross-fading two sizes of text looks doubled, so hide the old copy and
+ * let the new one scale from the old position.
+ */
+::view-transition-old(*.text) {
+  display: none;
+}
+
+::view-transition-new(*.text) {
+  animation: none;
+}
+
+/* Feather: list items arrive one after another from the right. */
+@keyframes lv-feather {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+/* Add to any element; set --i to its position in the list. */
+.feather {
+  animation: lv-feather var(--duration-feather) var(--ease-out-quint) both;
+  animation-delay: calc(min(var(--i, 0), 8) * var(--stagger-feather));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feather {
+    animation: none;
+  }
+}
