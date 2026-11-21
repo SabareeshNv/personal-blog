@@ -1,0 +1,86 @@
+---
+/**
+ * The web page a link post is about: an accent tile with a link icon,
+ * the page's title and its site address.
+ */
+import { linkHost } from '@/lib/posts';
+import Icon from './Icon.astro';
+
+interface Props {
+  url: string;
+  title?: string;
+}
+
+const { url, title } = Astro.props;
+const host = linkHost(url);
+---
+
+<a class="link-card" href={url} rel="external">
+  <span class="tile" aria-hidden="true"><Icon name="link" size={28} /></span>
+  <span class="text">
+    <span class="title">{title ?? host}</span>
+    {title && <span class="host">{host}</span>}
+  </span>
+</a>
+
+<style>
+  .link-card {
+    display: flex;
+    align-items: stretch;
+    border: var(--border-thin);
+    transition: border-color 0.15s;
+  }
+
+  .link-card:hover {
+    border-color: var(--color-accent-text);
+    text-decoration: none;
+  }
+
+  .link-card:hover .title {
+    text-decoration: underline;
+  }
+
+  .tile {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 4.5rem;
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-3xs);
+    min-width: 0;
+    padding: var(--space-xs) var(--space-s);
+  }
+
+  .title {
+    font-size: var(--text-m);
+    font-weight: var(--weight-bold);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .host {
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+
+  @media (width >= 48rem) {
+    .tile {
+      width: 6rem;
+    }
+
+    .text {
+      padding: var(--space-s) var(--space-m);
+    }
+
+    .title {
+      font-size: var(--text-l);
+    }
+  }
+</style>

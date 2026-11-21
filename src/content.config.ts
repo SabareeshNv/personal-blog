@@ -11,6 +11,8 @@ import { z } from 'astro/zod';
  *                    when the post has no title (a photo post)
  * - `tags`         — topics, shown under the post and on /topics/
  * - `description`  — a summary used on the timeline instead of an excerpt
+ * - `link`         — a web page the post is about, shown as a link card
+ *                    (`linkTitle` names it; otherwise the site's address shows)
  */
 const posts = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),
@@ -24,6 +26,8 @@ const posts = defineCollection({
         description: z.string().optional(),
         cover: image().optional(),
         coverAlt: z.string().optional(),
+        link: z.url().optional(),
+        linkTitle: z.string().optional(),
         tags: z.array(z.string()).default([]),
         /** Keep this post in the sidebar's “pinned” slot. */
         pinned: z.boolean().default(false),

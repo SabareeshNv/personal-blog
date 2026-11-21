@@ -58,11 +58,29 @@ const isCurrent = (match: string) => (match === '' ? section === '' || section =
     display: none;
   }
 
+  /*
+   * Phones: a soft fade at the right edge shows the menu scrolls sideways.
+   * The spacer after the last item lets it scroll fully clear of the fade.
+   */
+  ul {
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--space-xl)), transparent);
+  }
+
+  ul::after {
+    content: '';
+    flex: 0 0 var(--space-l);
+  }
+
   @media (width >= 48rem) {
     ul {
       flex-wrap: wrap;
       gap: 0 var(--space-l);
       overflow-x: visible;
+      mask-image: none;
+    }
+
+    ul::after {
+      content: none;
     }
 
     a {

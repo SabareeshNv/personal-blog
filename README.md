@@ -35,6 +35,8 @@ description: One-line summary shown on the timeline (else the opening text is us
 cover: ../../assets/covers/hills-dusk.jpg
 coverAlt: Layered hills at dusk.        # required when there is a cover
 tags: [meta, astro]
+link: https://example.com/article       # a page the post is about → link card
+linkTitle: The article's title          # optional; otherwise the site address shows
 pinned: true                            # show in the sidebar's “pinned” slot
 updated: 2026-12-01                     # when meaningfully edited
 draft: true                             # only visible in `npm run dev`
@@ -49,6 +51,7 @@ What a post has decides how it looks on the timeline:
 | title and cover   | The same, with the cover as a thumbnail beside it      |
 | cover, no title   | A photo post: the picture full width, then the text    |
 | neither           | A note: the full text                                  |
+| `link` (with any of the above) | A link card under the text, to the page the post is about |
 
 Put cover images in `src/assets/covers/`. Astro resizes them and converts them to WebP at build time.
 
@@ -64,7 +67,7 @@ Put cover images in `src/assets/covers/`. Astro resizes them and converts them t
 | `/about/`            | About the blog (`src/pages/about.astro`)               |
 | `/search/?q=…`       | Search results                                         |
 | `/content-policy/`, `/privacy-policy/` | The policies (placeholder text to replace) |
-| `/rss.xml`           | RSS feed                                               |
+| `/rss.xml`           | RSS feed: full posts, with cover images and links      |
 
 ## Changing things
 

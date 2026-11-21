@@ -9,6 +9,7 @@ import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import { isPhoto, postUrl, summary, type Post } from '@/lib/posts';
 import Icon from './Icon.astro';
+import LinkCard from './LinkCard.astro';
 import PostDate from './PostDate.astro';
 import TagList from './TagList.astro';
 
@@ -18,7 +19,7 @@ interface Props {
 }
 
 const { post, index = 0 } = Astro.props;
-const { title, cover, coverAlt, tags, date } = post.data;
+const { title, cover, coverAlt, tags, date, link, linkTitle } = post.data;
 const url = postUrl(post);
 const photo = isPhoto(post);
 const { Content } = !title ? await render(post) : { Content: null };
@@ -56,6 +57,7 @@ const { Content } = !title ? await render(post) : { Content: null };
         <div class="note">{Content && <Content />}</div>
       )
     }
+    {link && <LinkCard url={link} title={linkTitle} />}
     <TagList tags={tags} />
   </div>
 </article>

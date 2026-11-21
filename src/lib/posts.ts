@@ -42,6 +42,9 @@ export const displayTitle = (post: Post) => post.data.title ?? excerpt(post, 60)
 /** Summary shown on the timeline for titled posts. */
 export const summary = (post: Post) => post.data.description ?? excerpt(post);
 
+/** “example.com” from a link, without “www.”. */
+export const linkHost = (url: string) => new URL(url).hostname.replace(/^www\./, '');
+
 /** Lowercase, hyphenated, URL-safe version of a tag. */
 export const slugify = (value: string) =>
   value

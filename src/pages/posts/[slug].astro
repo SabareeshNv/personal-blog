@@ -4,6 +4,7 @@ import type { GetStaticPaths } from 'astro';
 import { getImage, Image } from 'astro:assets';
 import { render } from 'astro:content';
 import PostDate from '@/components/PostDate.astro';
+import LinkCard from '@/components/LinkCard.astro';
 import Prose from '@/components/Prose.astro';
 import Sidebar from '@/components/Sidebar.astro';
 import TagList from '@/components/TagList.astro';
@@ -29,7 +30,7 @@ interface Props {
 }
 
 const { post, newer, older } = Astro.props;
-const { title, cover, coverAlt, tags, date, updated } = post.data;
+const { title, cover, coverAlt, tags, date, updated, link, linkTitle } = post.data;
 const { Content } = await render(post);
 const heading = displayTitle(post);
 
@@ -90,6 +91,13 @@ const schema = [
         )
       }
       <Prose><Content /></Prose>
+      {
+        link && (
+          <div class="feather" style="--i: 2">
+            <LinkCard url={link} title={linkTitle} />
+          </div>
+        )
+      }
 
       <nav class="pager feather" style="--i: 3" aria-label="More posts" data-pagefind-ignore>
         {
