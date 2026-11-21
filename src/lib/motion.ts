@@ -26,8 +26,8 @@ export function motionFor(from: URL, to: URL): Motion {
 
 /** Turnstile exit: each visible item swings away on its left-edge hinge. */
 export const EXIT = {
-  duration: 200,
-  stagger: 40,
+  duration: 220,
+  stagger: 44,
   /** Items after this many leave together, so the exit stays short. */
   maxStagger: 6,
   angle: 80,
@@ -36,7 +36,7 @@ export const EXIT = {
 
 /** Continuum: the tapped title lifts slightly before it flies. */
 export const LIFT = {
-  duration: 120,
+  duration: 132,
   transform: 'translateY(-0.4rem) scale(1.03)',
   easing: 'cubic-bezier(0.2, 0, 0.4, 1)',
 };

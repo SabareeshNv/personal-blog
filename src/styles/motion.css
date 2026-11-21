@@ -15,9 +15,14 @@
 :root {
   --ease-in: cubic-bezier(0.55, 0, 0.9, 0.4);
   --ease-out-quint: cubic-bezier(0.1, 0.9, 0.2, 1);
-  --duration-morph: 0.45s;
-  --duration-feather: 0.45s;
-  --stagger-feather: 45ms;
+  /* All timings in one place (the turnstile exit's are in src/lib/motion.ts). */
+  --duration-morph: 0.495s; /* shared elements flying */
+  --duration-feather: 0.495s; /* each item turning in */
+  --stagger-feather: 50ms; /* gap between items */
+  --duration-fade: 0.11s; /* old column disappearing */
+  --duration-pivot-out: 0.22s;
+  --duration-pivot-in: 0.44s;
+  --delay-pivot: 0.088s;
   --hinge: perspective(800px);
 }
 
@@ -47,7 +52,7 @@
    disappear; the new column appears at once and its items feather in. */
 html[data-motion='turnstile']::view-transition-old(main),
 html[data-motion='turnstile']::view-transition-old(sidebar) {
-  animation: lv-fade-out 0.1s linear both !important;
+  animation: lv-fade-out var(--duration-fade) linear both !important;
 }
 
 html[data-motion='turnstile']::view-transition-new(main),
@@ -86,22 +91,22 @@ html[data-motion='turnstile']::view-transition-new(sidebar) {
 
 html[data-motion='pivot-next']::view-transition-old(main),
 html[data-motion='pivot-next']::view-transition-old(sidebar) {
-  animation: lv-pivot-out-left 0.2s var(--ease-in) both !important;
+  animation: lv-pivot-out-left var(--duration-pivot-out) var(--ease-in) both !important;
 }
 
 html[data-motion='pivot-next']::view-transition-new(main),
 html[data-motion='pivot-next']::view-transition-new(sidebar) {
-  animation: lv-pivot-in-right 0.4s var(--ease-out-quint) 0.08s both !important;
+  animation: lv-pivot-in-right var(--duration-pivot-in) var(--ease-out-quint) var(--delay-pivot) both !important;
 }
 
 html[data-motion='pivot-prev']::view-transition-old(main),
 html[data-motion='pivot-prev']::view-transition-old(sidebar) {
-  animation: lv-pivot-out-right 0.2s var(--ease-in) both !important;
+  animation: lv-pivot-out-right var(--duration-pivot-out) var(--ease-in) both !important;
 }
 
 html[data-motion='pivot-prev']::view-transition-new(main),
 html[data-motion='pivot-prev']::view-transition-new(sidebar) {
-  animation: lv-pivot-in-left 0.4s var(--ease-out-quint) 0.08s both !important;
+  animation: lv-pivot-in-left var(--duration-pivot-in) var(--ease-out-quint) var(--delay-pivot) both !important;
 }
 
 /* ---------- Shared elements (continuum) ---------- */
@@ -130,6 +135,31 @@ html[data-motion='pivot-prev']::view-transition-new(sidebar) {
 
 ::view-transition-new(*.text) {
   animation: none;
+}
+
+/*
+ * The homepage tagline has no partner on other pages. It waits while the
+ * site name flies and grows, then drops into place as the name lands; when
+ * leaving the homepage it fades out at once.
+ */
+@keyframes lv-tagline-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+
+::view-transition-group(tagline) {
+  animation: none !important;
+}
+
+::view-transition-old(tagline) {
+  animation: lv-fade-out var(--duration-fade) linear both !important;
+}
+
+::view-transition-new(tagline) {
+  animation: lv-tagline-in calc(var(--duration-morph) * 0.6) var(--ease-out-quint)
+    calc(var(--duration-morph) * 0.5) both !important;
 }
 
 /* ---------- Feather ---------- */

@@ -31,7 +31,13 @@ const NameTag = variant === 'home' ? 'h1' : 'p';
         <RoundButton href="/search/" icon="search" label="Search" current={onSearchPage} />
       </div>
     </div>
-    {variant === 'home' && <p class="tagline">{SITE.tagline}</p>}
+    {
+      variant === 'home' && (
+        <p class="tagline" transition:name="tagline" transition:animate="none">
+          {SITE.tagline}
+        </p>
+      )
+    }
     <div transition:name="pivot"><PivotNav /></div>
   </div>
 </header>
