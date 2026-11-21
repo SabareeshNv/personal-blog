@@ -60,7 +60,7 @@ const schema = [
   <article class="article" data-pagefind-body data-pagefind-meta={`date:${shortDate(date)}`}>
     <div data-pagefind-ignore transition:name={shared.date(post.id)}><PostDate date={date} /></div>
     <div class="body">
-      <header class="head">
+      <header class="head" data-feather>
         {/* Only a real title flies; a note's hidden heading must not get a name. */}
         {
           title ? (
@@ -91,7 +91,7 @@ const schema = [
       }
       <Prose><Content /></Prose>
 
-      <nav class="pager" aria-label="More posts" data-pagefind-ignore>
+      <nav class="pager feather" style="--i: 3" aria-label="More posts" data-pagefind-ignore>
         {
           older && (
             <a class="older" href={postUrl(older)}>

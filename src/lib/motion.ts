@@ -1,38 +1,49 @@
-import type { TransitionDirectionalAnimations } from 'astro';
-
 /**
- * Windows Phone “turnstile”: the new page swings in on a hinge at its left
- * edge; going back it swings in from the other side.
- *
- * The old page only fades out, quickly and without moving: rotating a whole
- * column of text makes its lines streak across a phone screen.
- * The keyframes live in src/styles/motion.css.
+ * Motion settings shared by MotionDirector.astro and the components.
+ * The animations themselves are drawn in src/styles/motion.css.
  */
-const out = { name: 'lv-fade-out', duration: '0.12s', easing: 'linear', fillMode: 'both' };
-const into = { duration: '0.4s', easing: 'cubic-bezier(0.1, 0.9, 0.2, 1)', fillMode: 'both' };
 
-function turnstile(delay = 0.08): TransitionDirectionalAnimations {
-  return {
-    forwards: {
-      old: out,
-      new: { name: 'lv-turnstile-in', ...into, delay: `${delay}s` },
-    },
-    backwards: {
-      old: out,
-      new: { name: 'lv-turnstile-in-back', ...into, delay: `${delay}s` },
-    },
-  };
+/** The menu sections in order; moving between them is a sideways pivot. */
+const SECTION_PATHS = ['/', '/topics/', '/archive/', '/about/'];
+
+/** Position of a URL in the menu, or undefined if it isn't a section page. */
+export function sectionIndex(url: URL): number | undefined {
+  const path = url.pathname.endsWith('/') ? url.pathname : `${url.pathname}/`;
+  if (/^\/\d+\/$/.test(path)) return 0; // homepage, page 2, 3…
+  const index = SECTION_PATHS.indexOf(path);
+  return index === -1 ? undefined : index;
 }
 
-/** The main column. */
-export const pageTurn = turnstile();
+export type Motion = 'pivot-next' | 'pivot-prev' | 'turnstile';
 
-/** The sidebar follows a moment later, like the next tile in a feather. */
-export const sideTurn = turnstile(0.16);
+/** Pivot between two different menu sections; turnstile for everything else. */
+export function motionFor(from: URL, to: URL): Motion {
+  const a = sectionIndex(from);
+  const b = sectionIndex(to);
+  if (a !== undefined && b !== undefined && a !== b) return b > a ? 'pivot-next' : 'pivot-prev';
+  return 'turnstile';
+}
+
+/** Turnstile exit: each visible item swings away on its left-edge hinge. */
+export const EXIT = {
+  duration: 200,
+  stagger: 40,
+  /** Items after this many leave together, so the exit stays short. */
+  maxStagger: 6,
+  angle: 80,
+  easing: 'cubic-bezier(0.55, 0, 0.9, 0.4)',
+};
+
+/** Continuum: the tapped title lifts slightly before it flies. */
+export const LIFT = {
+  duration: 120,
+  transform: 'translateY(-0.4rem) scale(1.03)',
+  easing: 'cubic-bezier(0.2, 0, 0.4, 1)',
+};
 
 /**
  * Shared-element names: the same element on two pages gets the same name,
- * so it flies from one position to the other (Windows Phone “continuum”).
+ * so it flies from one position to the other (continuum).
  */
 export const shared = {
   title: (id: string) => `post-title-${id}`,

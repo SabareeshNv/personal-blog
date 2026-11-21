@@ -4,12 +4,14 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Page not found" noindex>
+  <div data-feather>
   <p class="big" aria-hidden="true">404</p>
   <h1 class="title">page not found</h1>
   <p class="text">This page has moved or never existed. Try the latest posts, or search for what you were looking for.</p>
   <div class="actions">
     <RoundButton href="/" icon="arrow-left" text="back to posts" />
     <RoundButton href="/search/" icon="search" text="search" />
+  </div>
   </div>
 </BaseLayout>
 

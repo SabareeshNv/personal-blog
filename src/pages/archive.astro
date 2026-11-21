@@ -13,13 +13,13 @@ const years = groupByYearAndMonth(await getPosts());
   {
     years.map(({ year, months }, i) => (
       <section class="year" aria-labelledby={`year-${year}`}>
-        <h2 id={`year-${year}`} class:list={['year-title', { past: i > 0 }]}>
+        <h2 id={`year-${year}`} class:list={['year-title', 'feather', { past: i > 0 }]}>
           {year}
         </h2>
         {months.map(({ month, posts }) => (
           <section class="month" aria-label={`${month} ${year}`}>
-            <h3 class="month-title">{month}</h3>
-            <ul class="rows">
+            <h3 class="month-title feather" style="--i: 1">{month}</h3>
+            <ul class="rows" data-feather>
               {posts.map((post) => {
                 const { day, month: mon } = dateParts(post.data.date);
                 return (

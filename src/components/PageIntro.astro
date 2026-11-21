@@ -14,7 +14,7 @@ interface Props {
 const { title, lede, back, hidden = false } = Astro.props;
 ---
 
-<div class="intro">
+<div class="intro feather">
   {back && <a class="back" href={back.href}>← {back.label}</a>}
   <h1 class:list={['title', { 'visually-hidden': hidden }]}>{title}</h1>
   {lede && <p class="lede">{lede}</p>}

@@ -130,16 +130,24 @@ Each component keeps its markup, its styles (scoped with `<style>`) and its scri
 
 ## Motion
 
-Page changes use Astro's view transitions (`<ClientRouter />` in `BaseHead.astro`), styled after Windows Phone:
+Page changes use Astro's view transitions (`<ClientRouter />` in `BaseHead.astro`) and move like Windows Phone 7/8:
 
-- **Turnstile:** the main column swings away on a hinge at its left edge and the new page swings in; the sidebar follows a moment later. Going back plays it in reverse.
-- **Continuum:** a post's date, title and cover fly from the timeline to their place on the post page, and back.
-- **Header:** the site name shrinks from the giant homepage size to the compact one; the menu and the pink-to-orange shapes glide into place.
-- **Feather:** timeline posts, topic tiles and search results arrive one after another.
+- **Pivot:** between the menu sections (posts, topics, archive, about) the content slides sideways: left when moving right in the menu, right when moving left.
+- **Turnstile:** for everything else (opening a post or topic, search, back) the visible items swing away one by one on their left-edge hinge, top first; then the new page's items **feather** in, each turning in on its own hinge.
+- **Continuum:** the post you open keeps its date, title and cover. They lift slightly, then fly to their place on the post page, and back again.
+- **Header:** the site name shrinks between the homepage and other pages; the menu and the pink-to-orange shapes glide into place.
 
-The animations are defined in `src/lib/motion.ts` (which element animates how) and `src/styles/motion.css` (keyframes and timing). All motion is turned off for readers who set “reduce motion” in their system. Browsers without the View Transitions API simply load pages normally.
+Where things live:
 
-Scripts in pages run only once with the client router, so page setup belongs in an `astro:page-load` listener (see `src/pages/search.astro`).
+| File | What it does |
+| --- | --- |
+| `src/components/MotionDirector.astro` | Chooses pivot or turnstile for each navigation, plays the turnstile exit and the continuum lift |
+| `src/lib/motion.ts` | Timings, the menu order used for pivots, shared-element names |
+| `src/styles/motion.css` | Keyframes for pivot, feather, continuum |
+
+To make something feather in, give it `class="feather"` (with `style="--i: N"` for its place in a list) or put `data-feather` on its container. All motion is off for readers who set “reduce motion”; browsers without the View Transitions API load pages normally.
+
+Scripts in pages run only once with the client router, so page set-up belongs in an `astro:page-load` listener (see `src/pages/search.astro`).
 
 ## Deploying
 

@@ -1,0 +1,117 @@
+---
+/**
+ * Decides how each page change moves, Windows Phone style:
+ *
+ * - Pivot: between the menu sections (posts, topics, archive, about) the
+ *   content slides sideways, in the direction of the menu.
+ * - Turnstile: anywhere else, the visible items swing away one by one on
+ *   their left-edge hinge, then the new page's items feather in.
+ * - Continuum: the post being opened (or returned from) keeps its date, title
+ *   and cover; they lift slightly, then fly to their place on the next page.
+ *
+ * The choice is written to <html data-motion="…"> for src/styles/motion.css.
+ */
+---
+
+<script>
+  import { EXIT, LIFT, motionFor, shared } from '@/lib/motion';
+
+  type Part = keyof typeof shared;
+
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const POST_PATH = /^\/posts\/([^/]+)\/?$/;
+  const postIdOf = (url: URL) => url.pathname.match(POST_PATH)?.[1];
+
+  /* ---------- Continuum: name only the post involved ---------- */
+
+  function nameCard(doc: Document, id: string) {
+    const card = doc.querySelector<HTMLElement>(`[data-post-id="${CSS.escape(id)}"]`);
+    if (!card) return;
+    card.classList.add('continuum-target'); // flies; doesn't also feather in
+    card.querySelectorAll<HTMLElement>('[data-continuum]').forEach((el) => {
+      el.style.viewTransitionName = shared[el.dataset.continuum as Part](id);
+    });
+  }
+
+  function clearNames(doc: Document) {
+    doc.querySelectorAll<HTMLElement>('[data-continuum]').forEach((el) => {
+      el.style.viewTransitionName = '';
+    });
+  }
+
+  /** Elements that will fly to the next page (named post-…). */
+  function flyingElements(): HTMLElement[] {
+    return [...document.querySelectorAll<HTMLElement>('main [data-continuum], main [data-astro-transition-scope]')].filter(
+      (el) => getComputedStyle(el).viewTransitionName.startsWith('post-'),
+    );
+  }
+
+  /* ---------- Turnstile exit ---------- */
+
+  const ITEMS = 'main .feather, main [data-feather] > *, .sidebar > *';
+
+  function isOnScreen(el: Element) {
+    const box = el.getBoundingClientRect();
+    return box.height > 0 && box.bottom > 0 && box.top < innerHeight;
+  }
+
+  /** Visible items, top to bottom, leaving out anything that will fly. */
+  function exitingItems(flying: HTMLElement[]): HTMLElement[] {
+    return [...document.querySelectorAll<HTMLElement>(ITEMS)]
+      .filter((el) => isOnScreen(el) && !flying.some((f) => el === f || el.contains(f)))
+      .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+  }
+
+  async function playExit(back: boolean) {
+    const flying = flyingElements();
+    const angle = back ? EXIT.angle : -EXIT.angle;
+
+    const swings = exitingItems(flying).map((el, i) => {
+      el.style.transformOrigin = '0 50%';
+      return el.animate(
+        [
+          { transform: 'perspective(800px) rotateY(0deg)', opacity: 1 },
+          { transform: `perspective(800px) rotateY(${angle}deg)`, opacity: 0 },
+        ],
+        {
+          duration: EXIT.duration,
+          delay: Math.min(i, EXIT.maxStagger) * EXIT.stagger,
+          easing: EXIT.easing,
+          fill: 'forwards',
+        },
+      ).finished;
+    });
+
+    const lifts = flying.map(
+      (el) => el.animate([{ transform: 'none' }, { transform: LIFT.transform }], { duration: LIFT.duration, easing: LIFT.easing, fill: 'forwards' }).finished,
+    );
+
+    await Promise.all([...swings, ...lifts]);
+  }
+
+  /* ---------- Wiring ---------- */
+
+  document.addEventListener('astro:before-preparation', (event) => {
+    const motion = motionFor(event.from, event.to);
+    document.documentElement.dataset.motion = motion;
+
+    clearNames(document);
+    const id = postIdOf(event.to);
+    if (id) nameCard(document, id);
+
+    if (motion !== 'turnstile' || reducedMotion.matches) return;
+
+    // Let the items swing away while the next page loads; swap when both are done.
+    const load = event.loader;
+    event.loader = async () => {
+      await Promise.all([load(), playExit(event.direction === 'back')]);
+    };
+  });
+
+  document.addEventListener('astro:before-swap', (event) => {
+    // Astro copies <html> attributes from the incoming page, so set it there too.
+    event.newDocument.documentElement.dataset.motion = document.documentElement.dataset.motion;
+    const id = postIdOf(event.from);
+    if (id) nameCard(event.newDocument, id);
+  });
+</script>
