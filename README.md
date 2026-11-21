@@ -136,9 +136,9 @@ Each component keeps its markup, its styles (scoped with `<style>`) and its scri
 Page changes use Astro's view transitions (`<ClientRouter />` in `BaseHead.astro`) and move like Windows Phone 7/8:
 
 - **Pivot:** between the menu sections (posts, topics, archive, about) the content slides sideways: left when moving right in the menu, right when moving left.
-- **Turnstile:** for everything else (opening a post or topic, search, back) the visible items swing away one by one on their left-edge hinge, top first; then the new page's items **feather** in, each turning in on its own hinge.
+- **Turnstile:** for everything else (opening a post or topic, search, back) the visible items swing away one by one on their left-edge hinge, top first; then the new page turns in. Lists **feather** in item by item; other pages turn in as a few large blocks. Pages are pre-loaded as their links appear on screen, so the turn-in follows straight away.
 - **Continuum:** the post you open keeps its date, title and cover. They lift slightly, then fly to their place on the post page, and back again.
-- **Header:** the site name shrinks between the homepage and other pages; the menu and the pink-to-orange shapes glide into place.
+- **Header and sidebar:** stay put. Between the homepage and other pages the header simply cross-fades in place.
 
 Where things live:
 
