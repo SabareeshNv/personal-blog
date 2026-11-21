@@ -36,9 +36,6 @@ const { Content } = !title ? await render(post) : { Content: null };
               <a href={url}>{title}</a>
             </h2>
             <p class="summary">{summary(post)}</p>
-            <a class="more" href={url}>
-              continue reading <Icon name="arrow-right" size={16} />
-            </a>
           </div>
           {cover && (
             <a class="thumb" href={url} tabindex="-1" aria-hidden="true" data-continuum="cover">
@@ -58,7 +55,19 @@ const { Content } = !title ? await render(post) : { Content: null };
       )
     }
     {link && <LinkCard url={link} title={linkTitle} />}
-    <TagList tags={tags} />
+    {
+      (title || tags.length > 0) && (
+        <div class="foot">
+          <TagList tags={tags} />
+          {title && (
+            <a class="more" href={url}>
+              continue reading<span class="visually-hidden">: {title}</span>
+              <Icon name="arrow-right" size={16} />
+            </a>
+          )}
+        </div>
+      )
+    }
   </div>
 </article>
 
@@ -101,14 +110,32 @@ const { Content } = !title ? await render(post) : { Content: null };
     color: var(--color-body);
   }
 
+  /* Tags on the left, “continue reading” on the right edge, in one row. */
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-m);
+  }
+
+  /* White, not pink: pink marks topics, white marks the way into the post. */
   .more {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2xs);
-    align-self: flex-start;
+    margin-inline-start: auto;
     font-size: var(--text-s);
     font-weight: var(--weight-bold);
-    color: var(--color-accent-text);
+    color: var(--color-fg);
+    white-space: nowrap;
+  }
+
+  .more :global(svg) {
+    transition: transform 0.15s;
+  }
+
+  .more:hover :global(svg) {
+    transform: translateX(0.2rem);
   }
 
   .thumb,
