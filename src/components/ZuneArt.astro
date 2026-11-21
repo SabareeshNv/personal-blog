@@ -46,12 +46,13 @@ const { size = 'small' } = Astro.props;
     background: linear-gradient(90deg, var(--color-bg) 35%, transparent 80%);
   }
 
+  /* Phones: the shapes sit beside the name, clear of the menu below it. */
   svg {
     position: absolute;
     top: -0.75rem;
     right: -2rem;
-    width: 15rem;
-    height: 11rem;
+    width: 11rem;
+    height: 6.25rem;
   }
 
   .large svg {

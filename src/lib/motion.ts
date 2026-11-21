@@ -1,21 +1,24 @@
 import type { TransitionDirectionalAnimations } from 'astro';
 
 /**
- * Windows Phone “turnstile”: the old page swings away on a hinge at its left
- * edge, then the new page swings in. Going back plays it in reverse.
+ * Windows Phone “turnstile”: the new page swings in on a hinge at its left
+ * edge; going back it swings in from the other side.
+ *
+ * The old page only fades out, quickly and without moving: rotating a whole
+ * column of text makes its lines streak across a phone screen.
  * The keyframes live in src/styles/motion.css.
  */
-const out = { duration: '0.2s', easing: 'cubic-bezier(0.55, 0, 0.9, 0.4)', fillMode: 'both' };
+const out = { name: 'lv-fade-out', duration: '0.12s', easing: 'linear', fillMode: 'both' };
 const into = { duration: '0.4s', easing: 'cubic-bezier(0.1, 0.9, 0.2, 1)', fillMode: 'both' };
 
-function turnstile(delay = 0.12): TransitionDirectionalAnimations {
+function turnstile(delay = 0.08): TransitionDirectionalAnimations {
   return {
     forwards: {
-      old: { name: 'lv-turnstile-out', ...out },
+      old: out,
       new: { name: 'lv-turnstile-in', ...into, delay: `${delay}s` },
     },
     backwards: {
-      old: { name: 'lv-turnstile-out-back', ...out },
+      old: out,
       new: { name: 'lv-turnstile-in-back', ...into, delay: `${delay}s` },
     },
   };
@@ -25,7 +28,7 @@ function turnstile(delay = 0.12): TransitionDirectionalAnimations {
 export const pageTurn = turnstile();
 
 /** The sidebar follows a moment later, like the next tile in a feather. */
-export const sideTurn = turnstile(0.2);
+export const sideTurn = turnstile(0.16);
 
 /**
  * Shared-element names: the same element on two pages gets the same name,

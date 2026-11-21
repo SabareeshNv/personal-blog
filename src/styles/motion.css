@@ -13,40 +13,44 @@
   --stagger-feather: 45ms;
 }
 
-/* Turnstile: pages swing on a hinge at their left edge. */
-@keyframes lv-turnstile-out {
+@keyframes lv-fade-out {
   to {
     opacity: 0;
-    transform: perspective(1200px) rotateY(-70deg);
   }
 }
 
+/* Turnstile: the new page swings in on a hinge at its left edge. */
 @keyframes lv-turnstile-in {
   from {
     opacity: 0;
-    transform: perspective(1200px) rotateY(70deg);
-  }
-}
-
-@keyframes lv-turnstile-out-back {
-  to {
-    opacity: 0;
-    transform: perspective(1200px) rotateY(70deg);
+    transform: perspective(1200px) rotateY(55deg);
   }
 }
 
 @keyframes lv-turnstile-in-back {
   from {
     opacity: 0;
-    transform: perspective(1200px) rotateY(-70deg);
+    transform: perspective(1200px) rotateY(-55deg);
   }
 }
 
-::view-transition-old(main),
 ::view-transition-new(main),
-::view-transition-old(sidebar),
 ::view-transition-new(sidebar) {
   transform-origin: 0 50%;
+}
+
+/*
+ * The columns change height between pages. Don't morph their boxes (that
+ * stretches the text); each snapshot stays in place while it fades or turns.
+ */
+::view-transition-group(main),
+::view-transition-group(sidebar) {
+  animation: none;
+}
+
+::view-transition-old(main),
+::view-transition-old(sidebar) {
+  height: auto;
 }
 
 /* Shared elements (name, menu, titles, covers) fly with a long, soft ease-out. */
@@ -55,11 +59,18 @@
   animation-timing-function: var(--ease-out-quint);
 }
 
-/* A cover changes shape between thumbnail and full width: crop, don't stretch. */
-::view-transition-old(*.cover),
+/*
+ * A cover grows from thumbnail to full width (and back). Show one image,
+ * cropped to the moving box, instead of two sizes cross-fading.
+ */
+::view-transition-old(*.cover) {
+  display: none;
+}
+
 ::view-transition-new(*.cover) {
   height: 100%;
   object-fit: cover;
+  animation: none;
 }
 
 /*
