@@ -10,7 +10,7 @@ import SearchBox from '@/components/SearchBox.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Search" description="Search the posts on Lone Voice.">
+<BaseLayout title="Search" description="Search the posts on Lone Voice." noindex>
   <PageIntro title="search" />
   <div class="box">
     <SearchBox size="large" showLabel={false} id="search-page-field" />

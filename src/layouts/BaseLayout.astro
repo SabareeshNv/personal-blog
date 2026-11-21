@@ -5,29 +5,25 @@
  * Content goes in the default slot. Pass a `sidebar` slot to get the
  * two-column layout on large screens; without it the page is one column.
  */
-import BaseHead from '@/components/BaseHead.astro';
+import BaseHead, { type SeoProps } from '@/components/BaseHead.astro';
 import Continuum from '@/components/Continuum.astro';
 import SiteFooter from '@/components/SiteFooter.astro';
 import SiteHeader from '@/components/SiteHeader.astro';
 import { pageTurn, sideTurn } from '@/lib/motion';
 import { SITE } from '@/site.config';
 
-interface Props {
-  title?: string;
-  description?: string;
-  image?: string;
-  type?: 'website' | 'article';
+interface Props extends SeoProps {
   header?: 'home' | 'page';
 }
 
-const { title, description, image, type, header = 'page' } = Astro.props;
+const { header = 'page', ...seo } = Astro.props;
 const hasSidebar = Astro.slots.has('sidebar');
 ---
 
 <!doctype html>
 <html lang={SITE.lang}>
   <head>
-    <BaseHead title={title} description={description} image={image} type={type} />
+    <BaseHead {...seo} />
   </head>
   <body>
     <a class="skip-link" href="#content">Skip to content</a>

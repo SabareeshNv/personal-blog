@@ -1,7 +1,7 @@
 ---
 /** A single post: date block, title, tags, cover, text, then older/newer links. */
 import type { GetStaticPaths } from 'astro';
-import { Image } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 import { render } from 'astro:content';
 import PostDate from '@/components/PostDate.astro';
 import Prose from '@/components/Prose.astro';
@@ -10,7 +10,9 @@ import TagList from '@/components/TagList.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { shortDate } from '@/lib/format';
 import { shared } from '@/lib/motion';
-import { displayTitle, excerpt, getPosts, postUrl, type Post } from '@/lib/posts';
+import { displayTitle, getPosts, postUrl, summary, type Post } from '@/lib/posts';
+import { breadcrumbSchema, postSchema } from '@/lib/seo';
+import { SITE } from '@/site.config';
 
 export const getStaticPaths = (async () => {
   const posts = await getPosts();
@@ -27,16 +29,33 @@ interface Props {
 }
 
 const { post, newer, older } = Astro.props;
-const { title, cover, coverAlt, tags, date, description } = post.data;
+const { title, cover, coverAlt, tags, date, updated } = post.data;
 const { Content } = await render(post);
 const heading = displayTitle(post);
+
+// The same 1200×630 crop BaseHead uses for link previews.
+const socialImage = cover
+  ? (await getImage({ src: cover, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 82 })).src
+  : SITE.socialImage;
+const schema = [
+  postSchema(post, new URL(socialImage, Astro.site).href),
+  breadcrumbSchema([
+    [SITE.title, '/'],
+    [heading, postUrl(post)],
+  ]),
+];
 ---
 
 <BaseLayout
   title={heading}
-  description={description ?? excerpt(post)}
-  image={cover?.src}
+  description={summary(post)}
+  image={cover ?? SITE.socialImage}
+  imageAlt={coverAlt}
   type="article"
+  publishedTime={date}
+  modifiedTime={updated}
+  tags={tags}
+  schema={schema}
 >
   <article class="article" data-pagefind-body data-pagefind-meta={`date:${shortDate(date)}`}>
     <div data-pagefind-ignore transition:name={shared.date(post.id)}><PostDate date={date} /></div>
@@ -52,6 +71,13 @@ const heading = displayTitle(post);
             <h1 class="title visually-hidden" data-pagefind-meta="title">
               {heading}
             </h1>
+          )
+        }
+        {
+          updated && (
+            <p class="updated" data-pagefind-ignore>
+              updated <time datetime={updated.toISOString()}>{shortDate(updated)}</time>
+            </p>
           )
         }
         <div data-pagefind-ignore><TagList tags={tags} /></div>
@@ -107,6 +133,11 @@ const heading = displayTitle(post);
     font-size: var(--text-article-title);
     font-weight: var(--weight-bold);
     letter-spacing: -0.02em;
+  }
+
+  .updated {
+    font-size: var(--text-xs);
+    color: var(--color-muted);
   }
 
   .cover {

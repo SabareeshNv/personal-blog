@@ -5,7 +5,9 @@ import PageIntro from '@/components/PageIntro.astro';
 import Sidebar from '@/components/Sidebar.astro';
 import Timeline from '@/components/Timeline.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getTopics, type Topic } from '@/lib/posts';
+import { getTopics, tagUrl, type Topic } from '@/lib/posts';
+import { breadcrumbSchema } from '@/lib/seo';
+import { SITE } from '@/site.config';
 
 export const getStaticPaths = (async () => {
   return (await getTopics()).map((topic) => ({ params: { topic: topic.slug }, props: { topic } }));
@@ -19,7 +21,17 @@ const { topic } = Astro.props;
 const n = topic.posts.length;
 ---
 
-<BaseLayout title={`#${topic.name}`} description={`Posts about ${topic.name} on Lone Voice.`}>
+<BaseLayout
+  title={`#${topic.name}`}
+  description={`${n} ${n === 1 ? 'post' : 'posts'} about ${topic.name} on ${SITE.title}, newest first.`}
+  schema={[
+    breadcrumbSchema([
+      [SITE.title, '/'],
+      ['Topics', '/topics/'],
+      [`#${topic.name}`, tagUrl(topic.name)],
+    ]),
+  ]}
+>
   <PageIntro
     title={`#${topic.name}`}
     back={{ href: '/topics/', label: 'all topics' }}

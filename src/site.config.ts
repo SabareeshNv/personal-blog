@@ -9,7 +9,15 @@ export const SITE = {
   description: 'Lone Voice: short notes, links and photos, newest first.',
   /** The text in the accent tile at the top of the homepage sidebar. */
   intro: 'A quiet place for short notes on things worth writing down.',
-  url: 'https://lonevoice.pages.dev',
+  /**
+   * The site's address. Canonical links, the sitemap, robots.txt, RSS and
+   * structured data all use it. Change it here when the domain changes.
+   */
+  url: 'https://personal-blog-afn.pages.dev',
+  /** Who publishes the site (the blog stays anonymous, so the site name). */
+  publisher: 'Lone Voice',
+  /** Default image for link previews (1200×630, in public/). */
+  socialImage: '/og-default.jpg',
   lang: 'en',
   locale: 'en-GB',
   /** Dates are shown in this time zone, whatever the reader's own. */

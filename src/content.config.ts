@@ -18,6 +18,8 @@ const posts = defineCollection({
     z
       .object({
         date: z.coerce.date(),
+        /** Set when a post is meaningfully edited; shown and sent to search engines. */
+        updated: z.coerce.date().optional(),
         title: z.string().optional(),
         description: z.string().optional(),
         cover: image().optional(),

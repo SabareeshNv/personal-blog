@@ -6,6 +6,7 @@ import Sidebar from '@/components/Sidebar.astro';
 import Timeline from '@/components/Timeline.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getPosts, type Post } from '@/lib/posts';
+import { websiteSchema } from '@/lib/seo';
 import { SITE } from '@/site.config';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -17,10 +18,12 @@ interface Props {
 }
 
 const { page } = Astro.props;
-const title = page.currentPage > 1 ? `Page ${page.currentPage} of ${page.lastPage}` : undefined;
+const first = page.currentPage === 1;
+const title = first ? undefined : `Page ${page.currentPage} of ${page.lastPage}`;
+const description = first ? SITE.description : `Older posts on ${SITE.title}, page ${page.currentPage}.`;
 ---
 
-<BaseLayout title={title} header="home">
+<BaseLayout title={title} description={description} header="home" schema={first ? [websiteSchema()] : []}>
   <h2 class="visually-hidden">Latest posts</h2>
   <Timeline posts={page.data} />
   <Pagination page={page} />
