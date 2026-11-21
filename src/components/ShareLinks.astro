@@ -3,6 +3,7 @@
  * Round buttons that share the current page on Facebook, X, Telegram and
  * WhatsApp. Plain links to each service's share page: no scripts, no
  * trackers. The services build the preview from the page's Open Graph tags.
+ * A small "share" label sits above the row. Used in the sidebar and on About.
  */
 import { SITE } from '@/site.config';
 import RoundButton from './RoundButton.astro';
@@ -18,23 +19,39 @@ const services: { name: string; icon: IconName; href: string }[] = [
 ];
 ---
 
-<ul class="share" aria-label="Share this page">
-  {
-    services.map((s) => (
-      <li>
-        <RoundButton href={s.href} icon={s.icon} label={`Share on ${s.name}`} external />
-      </li>
-    ))
-  }
-</ul>
+<div class="share">
+  <p class="label" id="share-label">share</p>
+  <ul aria-labelledby="share-label">
+    {
+      services.map((s) => (
+        <li>
+          <RoundButton href={s.href} icon={s.icon} label={`Share on ${s.name}`} external />
+        </li>
+      ))
+    }
+  </ul>
+</div>
 
 <style>
-  .share {
+  .label {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--text-l);
+    font-weight: var(--weight-light);
+    line-height: var(--leading-tight);
+    color: var(--color-fg);
+  }
+
+  .share ul {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-xs);
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  /* Undo prose list spacing on the About page. */
+  .share li {
+    margin: 0;
   }
 </style>

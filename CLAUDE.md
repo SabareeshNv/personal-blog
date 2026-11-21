@@ -59,7 +59,7 @@ Project memory for Claude. Read this before changing anything. Keep it current: 
   1. Intro tile (homepage only; text in `SITE.intro`)
   2. Search box (Pagefind)
   3. Pinned post on a pink→orange card
-  4. "subscribe with RSS", with a row of round share buttons under it (Facebook, X, Telegram, WhatsApp; `ShareLinks.astro`). They are plain links to each service's share page for the current page's address, open in a new tab (`RoundButton external`), and need no script. Brand icons come from Simple Icons (CC0) in `Icon.astro`.
+  4. "subscribe with RSS", with a small "share" label and a row of round share buttons under it (Facebook, X, Telegram, WhatsApp; `ShareLinks.astro`). The same share block also sits under "Follow along" on the About page. They are plain links to each service's share page for the current page's address, open in a new tab (`RoundButton external`), and need no script. Brand icons come from Simple Icons (CC0) in `Icon.astro`.
 
   The owner rejected repeating the menu items in the sidebar, and rejected "recent covers".
 - **Timeline** (`PostCard`): one column, newest first.

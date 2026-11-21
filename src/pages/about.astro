@@ -1,5 +1,6 @@
 ---
 import RoundButton from '@/components/RoundButton.astro';
+import ShareLinks from '@/components/ShareLinks.astro';
 import PageLayout from '@/layouts/PageLayout.astro';
 import { SITE } from '@/site.config';
 ---
@@ -15,6 +16,7 @@ import { SITE } from '@/site.config';
 
   <h2>Follow along</h2>
   <RoundButton href="/rss.xml" icon="rss" text="subscribe with RSS" />
+  <ShareLinks />
 </PageLayout>
 
 <style>
