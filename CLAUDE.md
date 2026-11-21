@@ -25,7 +25,11 @@ Project memory for Claude. Read this before changing anything. Keep it current: 
 - **Anonymous.** No personal name, photo or author byline anywhere. The publisher is the site name (`SITE.publisher`) in structured data too. The owner said: "I won't be using my personal name in this website/blog."
 - **No Tailwind, no CSS framework.** The owner explicitly switched from Tailwind 4 to hand-written modern CSS: grid, flexbox, custom properties and logical properties.
 - **Co-located Astro components.** Each component keeps its markup, scoped `<style>` and `<script>` in one `.astro` file. Global CSS is only `tokens.css`, `global.css` (a reset plus `.container` and `.visually-hidden`) and `motion.css`.
-- **Mobile first.** Base styles are for phones. There are only **two breakpoints**: `@media (width >= 48rem)` (tablet) and `@media (width >= 64rem)` (desktop, two columns). Don't add others.
+- **Mobile first, three sizes.** Base styles (no media query) are the **mobile** layout, under 48rem (768 px). Two breakpoints switch to the larger sizes:
+  - `@media (width >= 48rem)`: **tablet**, 768–1023 px. One column, the stacked date block, larger type, 240 px thumbnails.
+  - `@media (width >= 64rem)`: **desktop**, 1024 px and up. Two columns with a sticky sidebar.
+
+  The owner expects mobile, tablet and desktop to be distinct. Don't add another size without asking; a large-desktop or small-phone size has been offered but not chosen.
 - **Tokens only.** Colours, font sizes, spacing and widths come from `src/styles/tokens.css`. Never hard-code a value a token exists for. Some tokens change value at 48rem, so components often need no media query.
 - **English interface**, Open Sans 300/400/600 (via `@fontsource/open-sans`).
 - **Dark only** (`color-scheme: dark`). Every colour token also has a light value via `light-dark()`. Changing it to `dark light` would follow the reader's system setting, but the owner hasn't asked for that.

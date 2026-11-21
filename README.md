@@ -117,7 +117,7 @@ Each component keeps its markup, its styles (scoped with `<style>`) and its scri
 
 ### CSS conventions
 
-- **Mobile first.** Base styles are for phones. Wider screens are added with `@media (width >= 48rem)` (tablet) and `@media (width >= 64rem)` (desktop, two columns). These are the only two breakpoints.
+- **Mobile first, three sizes.** Base styles are the mobile layout (under 768 px). `@media (width >= 48rem)` switches to tablet (768–1023 px) and `@media (width >= 64rem)` to desktop (1024 px and up, two columns).
 - **Tokens only.** Colours, font sizes and spacing come from `tokens.css`. Some tokens change value at 48rem, so components often need no media query at all.
 - **Logical properties** (`margin-block-start`, `padding-inline`) and **flexbox/grid with `gap`** for layout.
 - **Accessible by default:** real links and buttons, visible focus outlines, a skip link, labelled icons, and `prefers-reduced-motion` respected.
